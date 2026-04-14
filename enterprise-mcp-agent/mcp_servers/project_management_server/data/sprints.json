@@ -1,0 +1,62 @@
+[
+  {
+    "id": "PAYMENTS-S22",
+    "name": "Payments Sprint 22",
+    "project": "PAYMENTS",
+    "state": "completed",
+    "start_date": "2026-03-09",
+    "end_date": "2026-03-20",
+    "goal": "Improve payment reliability and add retry mechanisms",
+    "tickets": ["PAY-180", "PAY-181", "PAY-182", "PAY-183", "PAY-184"],
+    "committed_points": 34,
+    "completed_points": 29
+  },
+  {
+    "id": "PAYMENTS-S23",
+    "name": "Payments Sprint 23",
+    "project": "PAYMENTS",
+    "state": "completed",
+    "start_date": "2026-03-23",
+    "end_date": "2026-04-03",
+    "goal": "Address critical bugs and stabilize refund pipeline",
+    "tickets": ["PAY-189", "PAY-195", "PAY-198", "PAY-200", "PAY-201"],
+    "committed_points": 38,
+    "completed_points": 32
+  },
+  {
+    "id": "PAYMENTS-S24",
+    "name": "Payments Sprint 24",
+    "project": "PAYMENTS",
+    "state": "active",
+    "start_date": "2026-04-06",
+    "end_date": "2026-04-17",
+    "goal": "Ship idempotent retries, fix P0 international payments bug, begin analytics API",
+    "tickets": ["PAY-189", "PAY-210", "PAY-211", "PAY-214", "PAY-215", "PAY-216"],
+    "committed_points": 42,
+    "completed_points": 8
+  },
+  {
+    "id": "CHECKOUT-S11",
+    "name": "Checkout Sprint 11",
+    "project": "CHECKOUT",
+    "state": "completed",
+    "start_date": "2026-03-23",
+    "end_date": "2026-04-03",
+    "goal": "Fix billing bugs and complete Vite migration",
+    "tickets": ["CHK-41", "CHK-42", "CHK-43", "CHK-44"],
+    "committed_points": 26,
+    "completed_points": 26
+  },
+  {
+    "id": "CHECKOUT-S12",
+    "name": "Checkout Sprint 12",
+    "project": "CHECKOUT",
+    "state": "active",
+    "start_date": "2026-04-06",
+    "end_date": "2026-04-17",
+    "goal": "Launch checkout wizard redesign and wallet payments",
+    "tickets": ["CHK-45", "CHK-48", "CHK-49", "CHK-52"],
+    "committed_points": 34,
+    "completed_points": 5
+  }
+]

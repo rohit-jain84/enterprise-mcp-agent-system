@@ -1,0 +1,80 @@
+# ===== Planning & Documentation (not part of project) =====
+*.html
+Description.txt
+
+# ===== AI Tool Config =====
+.claude/
+CLAUDE.md
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+*.whl
+.Python
+dist/
+build/
+eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+*.manifest
+*.spec
+*.pyo
+.venv/
+venv/
+env/
+
+# Linting & type checking cache
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# ===== Node.js =====
+node_modules/
+dist/
+.next/
+out/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===== Docker =====
+docker-compose.override.yml
+
+# ===== Database =====
+*.sql.bak
+pgdata/
+
+# ===== Alembic =====
+alembic/versions/__pycache__/
+
+# ===== Environment & Secrets =====
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ===== IDE & Editor =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OS Files =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Logs =====
+logs/

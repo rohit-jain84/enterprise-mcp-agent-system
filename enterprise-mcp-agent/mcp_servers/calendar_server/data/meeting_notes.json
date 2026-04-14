@@ -1,0 +1,116 @@
+[
+  {
+    "meeting_id": "MTG-001",
+    "title": "Payments Team Standup - April 7",
+    "date": "2026-04-07",
+    "recorded_by": "sarah.chen",
+    "discussion_points": [
+      "PAY-210 (P0): James reported the international payments null currency bug. ~150 failed transactions/day. He has the root cause identified and will have a PR up today.",
+      "PAY-189: Sarah's idempotent retry PR #247 has one approval from Marcus. Elena requested changes on the idempotency key expiration edge case. Design review scheduled for 11am today.",
+      "PAY-211: Alex is working through the Stripe v12 upgrade. CI is failing on webhook handler tests - needs to update test fixtures for the new event format.",
+      "PAY-214: Marcus picked up the webhook delivery reliability issue. Will start after the design review.",
+      "PAY-215: Priya has the volume endpoint done for the analytics API. Working on success rate and latency endpoints."
+    ],
+    "decisions": [
+      "PAY-210 is top priority - James to have fix ready for review by EOD.",
+      "Design review for PAY-189 idempotency key approach at 11am in Conference Room B."
+    ],
+    "action_items": [
+      {"assignee": "james.wilson", "description": "Submit PR for PAY-210 null currency fix", "due_date": "2026-04-07", "status": "done"},
+      {"assignee": "sarah.chen", "description": "Address Elena's feedback on PR #247 key expiration handling", "due_date": "2026-04-08", "status": "open"},
+      {"assignee": "alex.kumar", "description": "Update Stripe webhook test fixtures for v12 format", "due_date": "2026-04-09", "status": "open"},
+      {"assignee": "marcus.johnson", "description": "Start on webhook retry queue implementation (PAY-214)", "due_date": "2026-04-08", "status": "open"}
+    ]
+  },
+  {
+    "meeting_id": "MTG-003",
+    "title": "Checkout Team Standup - April 7",
+    "date": "2026-04-07",
+    "recorded_by": "elena.rodriguez",
+    "discussion_points": [
+      "CHK-45: Elena's checkout wizard PR #112 has approval from Priya but James requested accessibility changes. Focus management between steps and aria-labels on the progress indicator.",
+      "CHK-48: James's Apple Pay / Google Pay PR #114 is approved by Elena. Ready to merge.",
+      "CHK-49: Priya is working on guest checkout session management. Expects a PR by end of week.",
+      "CHK-52: Elena found that the shipping form loses state on browser back. Opened a draft PR #116 with a session storage fix."
+    ],
+    "decisions": [
+      "CHK-48 (Apple Pay/Google Pay) to be merged once CI passes.",
+      "Elena to address a11y feedback on checkout wizard before end of sprint."
+    ],
+    "action_items": [
+      {"assignee": "elena.rodriguez", "description": "Add aria-labels and focus management to checkout wizard (PR #112)", "due_date": "2026-04-09", "status": "open"},
+      {"assignee": "james.wilson", "description": "Merge Apple Pay / Google Pay PR #114 after CI", "due_date": "2026-04-07", "status": "open"},
+      {"assignee": "priya.patel", "description": "Submit PR for guest checkout (CHK-49)", "due_date": "2026-04-11", "status": "open"}
+    ]
+  },
+  {
+    "meeting_id": "MTG-005",
+    "title": "Sprint 24/12 Planning - April 6",
+    "date": "2026-04-06",
+    "recorded_by": "sarah.chen",
+    "discussion_points": [
+      "Reviewed Payments Sprint 23 results: 32/38 points completed (84%). Carry-over: PAY-189 (idempotent retries, 8pts) still in review.",
+      "Reviewed Checkout Sprint 11 results: 26/26 points completed (100%). Great sprint!",
+      "Payments Sprint 24 goal: Ship idempotent retries (PAY-189), fix P0 international payments bug (PAY-210), begin analytics API (PAY-215).",
+      "Checkout Sprint 12 goal: Launch checkout wizard redesign (CHK-45), ship wallet payments (CHK-48), implement guest checkout (CHK-49).",
+      "New P0 bug PAY-210 discovered over the weekend - international payments failing with null currency. James volunteered to take it.",
+      "PAY-216 (rate limiting) added to Sprint 24 but currently unassigned. Alex may pick it up after Stripe upgrade.",
+      "Team capacity discussion: Elena is over-committed (16pts vs 13 capacity). James and Priya are also slightly over. Need to watch burnout."
+    ],
+    "decisions": [
+      "Payments Sprint 24 committed to 42 points (ambitious given velocity average of ~30).",
+      "Checkout Sprint 12 committed to 34 points.",
+      "PAY-210 is the top priority for the Payments team.",
+      "PAY-216 will be assigned once someone frees up capacity."
+    ],
+    "action_items": [
+      {"assignee": "james.wilson", "description": "Take on PAY-210 P0 bug as top priority", "due_date": "2026-04-08", "status": "done"},
+      {"assignee": "sarah.chen", "description": "Finalize PAY-189 idempotent retry PR based on review feedback", "due_date": "2026-04-09", "status": "open"},
+      {"assignee": "elena.rodriguez", "description": "Assess if CHK-52 can be deferred to reduce overcommitment", "due_date": "2026-04-07", "status": "done"},
+      {"assignee": "priya.patel", "description": "Draft analytics API endpoint spec for design review", "due_date": "2026-04-11", "status": "open"}
+    ]
+  },
+  {
+    "meeting_id": "MTG-007",
+    "title": "Payment Retry Design Review - April 7",
+    "date": "2026-04-07",
+    "recorded_by": "marcus.johnson",
+    "discussion_points": [
+      "Reviewed Sarah's idempotency key design in PR #247. Uses Redis-backed store with 24h TTL.",
+      "Elena raised concern: if a transaction takes >24h to fully settle and the key expires, a retry could create a duplicate. Edge case but possible for international wire transfers.",
+      "Discussed options: (a) extend TTL to 72h, (b) tie key expiration to transaction settlement status, (c) use database-backed keys with no TTL.",
+      "Marcus suggested a hybrid: Redis for fast lookups + database for persistence. Keys remain in Redis for 24h but are always backed by the DB.",
+      "Alex pointed out that the retry backoff strategy should use jitter to avoid thundering herd on recovery from outages."
+    ],
+    "decisions": [
+      "Adopt hybrid approach: Redis cache + database persistence for idempotency keys.",
+      "Key TTL in Redis: 24h. Database records: permanent (with cleanup job for records >90 days old).",
+      "Add jitter to the exponential backoff in retry logic."
+    ],
+    "action_items": [
+      {"assignee": "sarah.chen", "description": "Update PR #247 with hybrid Redis+DB idempotency key storage", "due_date": "2026-04-09", "status": "open"},
+      {"assignee": "sarah.chen", "description": "Add jitter to retry backoff implementation", "due_date": "2026-04-09", "status": "open"},
+      {"assignee": "elena.rodriguez", "description": "Re-review PR #247 after changes", "due_date": "2026-04-10", "status": "open"}
+    ]
+  },
+  {
+    "meeting_id": "MTG-006",
+    "title": "Sarah / James 1:1 - April 7",
+    "date": "2026-04-07",
+    "recorded_by": "sarah.chen",
+    "discussion_points": [
+      "James is progressing well on the PAY-210 P0 fix. Root cause is simple - null check missing in the validator.",
+      "Discussed James's cross-team role. He's splitting time between Payments (PAY-210) and Checkout (CHK-48 Apple Pay). Currently at 11 points vs 10 capacity.",
+      "James interested in taking on more backend architecture work. Sarah will look for opportunities in upcoming sprints.",
+      "Talked about the checkout wizard a11y review - James wants to champion accessibility practices across both teams."
+    ],
+    "decisions": [
+      "After PAY-210 is merged, James will focus on CHK-48 merge and then the checkout wizard a11y review.",
+      "Sarah will include James in architecture discussions for the multi-currency settlement feature (PAY-213) next sprint."
+    ],
+    "action_items": [
+      {"assignee": "james.wilson", "description": "Complete PAY-210 fix and get it merged", "due_date": "2026-04-08", "status": "done"},
+      {"assignee": "sarah.chen", "description": "Loop James into PAY-213 architecture planning", "due_date": "2026-04-17", "status": "open"}
+    ]
+  }
+]

@@ -1,0 +1,185 @@
+# ===========================================================================
+# Output Rails: Bot response filtering and output safety
+# ===========================================================================
+
+# -------------------------------------------------------------------
+# Allowed bot response patterns
+# -------------------------------------------------------------------
+
+define bot provide project info
+  "Here is the project information you requested."
+
+define bot provide github info
+  "Here are the GitHub details you requested."
+
+define bot provide jira info
+  "Here are the Jira details you requested."
+
+define bot provide calendar info
+  "Here are the calendar details you requested."
+
+define bot provide team info
+  "Here is the team status information."
+
+# -------------------------------------------------------------------
+# Dangerous output patterns: harmful content
+# -------------------------------------------------------------------
+
+define bot respond with harmful content
+  "Here is how to hack..."
+  "Here is the exploit code..."
+  "Here is the malware..."
+  "Here are the stolen credentials..."
+  "Here is the phishing template..."
+  "Here is a script to attack..."
+  "Here is how to bypass security..."
+  "Here is the keylogger code..."
+  "Here is how to social engineer..."
+  "To perform a DDoS attack..."
+  "Here is how to break into..."
+  "To exploit this vulnerability..."
+
+# -------------------------------------------------------------------
+# Dangerous output patterns: off-topic content
+# -------------------------------------------------------------------
+
+define bot respond off topic
+  "Here is a recipe for..."
+  "The meaning of life is..."
+  "Here is a poem..."
+  "Here is a joke..."
+  "Let me tell you about history..."
+  "The weather today is..."
+  "Here is a story..."
+  "My opinion on politics is..."
+  "Here is investment advice..."
+  "For your medical condition..."
+  "As a legal matter..."
+  "Here is a blog post about cooking..."
+  "For your vacation, I recommend..."
+
+# -------------------------------------------------------------------
+# Dangerous output patterns: system information leaks
+# -------------------------------------------------------------------
+
+define bot leak system prompt
+  "My instructions are..."
+  "My system prompt says..."
+  "I was told to..."
+  "My initial instructions..."
+  "Here is my configuration..."
+  "My instructions tell me to..."
+  "The system prompt is..."
+  "I was configured to..."
+  "My prompt says..."
+
+define bot leak internal tools
+  "I have access to the following tools:"
+  "My available functions are:"
+  "I can call the following APIs:"
+  "The MCP servers I'm connected to are:"
+  "My internal tools include:"
+  "I use the following endpoints:"
+  "The backend architecture is:"
+  "I'm connected to these services:"
+  "The tool names I have are:"
+
+define bot leak credentials
+  "The API key is..."
+  "The token is..."
+  "The password is..."
+  "The secret key is..."
+  "Here are the credentials..."
+  "The authentication token..."
+  "The database connection string is..."
+  "The environment variable contains..."
+  "The .env file has..."
+  "The access key is..."
+  "The OAuth token is..."
+  "The JWT secret is..."
+
+define bot leak architecture details
+  "The system architecture includes..."
+  "The database schema is..."
+  "The server configuration is..."
+  "The infrastructure runs on..."
+  "The backend uses the following stack..."
+  "The deployment pipeline is configured as..."
+  "The internal API endpoints are..."
+  "The microservices communicate via..."
+  "The authentication flow works by..."
+  "We store data in the following databases..."
+
+define bot generate sysadmin commands
+  "Run the following command: rm -rf"
+  "Execute: sudo"
+  "Run this shell command:"
+  "Here is the SSH command:"
+  "Execute this on the server:"
+  "Run chmod"
+  "Execute DROP TABLE"
+  "Run this database command:"
+  "Here is the admin command:"
+
+# -------------------------------------------------------------------
+# Output filtering flows
+# -------------------------------------------------------------------
+
+define flow check output
+  """Primary output filter: block harmful, off-topic, and dangerous responses."""
+
+  when bot respond with harmful content
+    bot replace with safe response
+    stop
+
+  when bot respond off topic
+    bot redirect to work topics
+    stop
+
+  when bot generate sysadmin commands
+    bot refuse sysadmin output
+    stop
+
+define flow block internal disclosure
+  """Prevent the bot from revealing internal system details."""
+
+  when bot leak system prompt
+    bot refuse prompt leak
+    stop
+
+  when bot leak internal tools
+    bot refuse tool disclosure
+    stop
+
+  when bot leak credentials
+    bot refuse credential disclosure
+    stop
+
+  when bot leak architecture details
+    bot refuse architecture disclosure
+    stop
+
+# -------------------------------------------------------------------
+# Bot response definitions for output rails
+# -------------------------------------------------------------------
+
+define bot replace with safe response
+  "I'm not able to provide that information. Let me help you with a project management, GitHub, Jira, or calendar task instead."
+
+define bot redirect to work topics
+  "Let me refocus on your work-related needs. I can help with project management, GitHub operations, Jira tickets, calendar scheduling, and team coordination. What would you like to work on?"
+
+define bot refuse prompt leak
+  "I'm not able to share details about my internal instructions or configuration. I'm here to help with project management tasks. How can I assist you?"
+
+define bot refuse tool disclosure
+  "I'm not able to disclose information about my internal tools or system capabilities. For security reasons, this information is confidential. I can help you with project management, GitHub, Jira, or calendar operations."
+
+define bot refuse credential disclosure
+  "I cannot share API keys, tokens, passwords, or any authentication credentials. This information is strictly confidential. Is there a work-related task I can help you with?"
+
+define bot refuse architecture disclosure
+  "I'm not able to reveal details about the system's internal architecture, infrastructure, or technical implementation. This information is confidential for security reasons. How can I help with your project management needs?"
+
+define bot refuse sysadmin output
+  "I cannot provide system administration commands or server-level operations. Please work with your DevOps team for infrastructure changes. I can help with project management, GitHub, Jira, or calendar tasks instead."

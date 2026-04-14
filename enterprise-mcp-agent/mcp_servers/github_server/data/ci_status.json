@@ -1,0 +1,137 @@
+[
+  {
+    "ref": "main",
+    "repo": "acme/payments-service",
+    "status": "passed",
+    "checks": [
+      {"name": "unit-tests", "status": "passed", "duration_seconds": 45, "url": "https://ci.acme.com/payments-service/runs/1201"},
+      {"name": "integration-tests", "status": "passed", "duration_seconds": 120, "url": "https://ci.acme.com/payments-service/runs/1201"},
+      {"name": "lint", "status": "passed", "duration_seconds": 12, "url": "https://ci.acme.com/payments-service/runs/1201"},
+      {"name": "type-check", "status": "passed", "duration_seconds": 18, "url": "https://ci.acme.com/payments-service/runs/1201"},
+      {"name": "security-scan", "status": "passed", "duration_seconds": 35, "url": "https://ci.acme.com/payments-service/runs/1201"}
+    ],
+    "started_at": "2026-04-01T10:02:00Z",
+    "completed_at": "2026-04-01T10:05:30Z",
+    "commit_sha": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0"
+  },
+  {
+    "ref": "pr-247",
+    "repo": "acme/payments-service",
+    "status": "passed",
+    "checks": [
+      {"name": "unit-tests", "status": "passed", "duration_seconds": 52, "url": "https://ci.acme.com/payments-service/runs/1245"},
+      {"name": "integration-tests", "status": "passed", "duration_seconds": 138, "url": "https://ci.acme.com/payments-service/runs/1245"},
+      {"name": "lint", "status": "passed", "duration_seconds": 12, "url": "https://ci.acme.com/payments-service/runs/1245"},
+      {"name": "type-check", "status": "passed", "duration_seconds": 19, "url": "https://ci.acme.com/payments-service/runs/1245"},
+      {"name": "security-scan", "status": "passed", "duration_seconds": 35, "url": "https://ci.acme.com/payments-service/runs/1245"}
+    ],
+    "started_at": "2026-04-07T16:32:00Z",
+    "completed_at": "2026-04-07T16:36:15Z",
+    "commit_sha": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3"
+  },
+  {
+    "ref": "pr-249",
+    "repo": "acme/payments-service",
+    "status": "failed",
+    "checks": [
+      {"name": "unit-tests", "status": "passed", "duration_seconds": 48, "url": "https://ci.acme.com/payments-service/runs/1250"},
+      {"name": "integration-tests", "status": "failed", "duration_seconds": 95, "url": "https://ci.acme.com/payments-service/runs/1250"},
+      {"name": "lint", "status": "passed", "duration_seconds": 13, "url": "https://ci.acme.com/payments-service/runs/1250"},
+      {"name": "type-check", "status": "passed", "duration_seconds": 20, "url": "https://ci.acme.com/payments-service/runs/1250"},
+      {"name": "security-scan", "status": "passed", "duration_seconds": 34, "url": "https://ci.acme.com/payments-service/runs/1250"}
+    ],
+    "started_at": "2026-04-07T09:16:00Z",
+    "completed_at": "2026-04-07T09:19:45Z",
+    "commit_sha": "a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6"
+  },
+  {
+    "ref": "pr-250",
+    "repo": "acme/payments-service",
+    "status": "running",
+    "checks": [
+      {"name": "unit-tests", "status": "passed", "duration_seconds": 44, "url": "https://ci.acme.com/payments-service/runs/1260"},
+      {"name": "integration-tests", "status": "running", "duration_seconds": null, "url": "https://ci.acme.com/payments-service/runs/1260"},
+      {"name": "lint", "status": "passed", "duration_seconds": 11, "url": "https://ci.acme.com/payments-service/runs/1260"},
+      {"name": "type-check", "status": "passed", "duration_seconds": 17, "url": "https://ci.acme.com/payments-service/runs/1260"},
+      {"name": "security-scan", "status": "pending", "duration_seconds": null, "url": "https://ci.acme.com/payments-service/runs/1260"}
+    ],
+    "started_at": "2026-04-07T15:46:00Z",
+    "completed_at": null,
+    "commit_sha": "e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0"
+  },
+  {
+    "ref": "pr-251",
+    "repo": "acme/payments-service",
+    "status": "passed",
+    "checks": [
+      {"name": "unit-tests", "status": "passed", "duration_seconds": 46, "url": "https://ci.acme.com/payments-service/runs/1265"},
+      {"name": "integration-tests", "status": "passed", "duration_seconds": 110, "url": "https://ci.acme.com/payments-service/runs/1265"},
+      {"name": "lint", "status": "passed", "duration_seconds": 12, "url": "https://ci.acme.com/payments-service/runs/1265"},
+      {"name": "type-check", "status": "passed", "duration_seconds": 18, "url": "https://ci.acme.com/payments-service/runs/1265"},
+      {"name": "security-scan", "status": "passed", "duration_seconds": 33, "url": "https://ci.acme.com/payments-service/runs/1265"}
+    ],
+    "started_at": "2026-04-08T08:02:00Z",
+    "completed_at": "2026-04-08T08:05:20Z",
+    "commit_sha": "c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8"
+  },
+  {
+    "ref": "main",
+    "repo": "acme/checkout-frontend",
+    "status": "passed",
+    "checks": [
+      {"name": "unit-tests", "status": "passed", "duration_seconds": 32, "url": "https://ci.acme.com/checkout-frontend/runs/890"},
+      {"name": "e2e-tests", "status": "passed", "duration_seconds": 180, "url": "https://ci.acme.com/checkout-frontend/runs/890"},
+      {"name": "lint", "status": "passed", "duration_seconds": 8, "url": "https://ci.acme.com/checkout-frontend/runs/890"},
+      {"name": "type-check", "status": "passed", "duration_seconds": 15, "url": "https://ci.acme.com/checkout-frontend/runs/890"},
+      {"name": "bundle-size-check", "status": "passed", "duration_seconds": 22, "url": "https://ci.acme.com/checkout-frontend/runs/890"}
+    ],
+    "started_at": "2026-04-02T11:32:00Z",
+    "completed_at": "2026-04-02T11:36:30Z",
+    "commit_sha": "a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2"
+  },
+  {
+    "ref": "pr-112",
+    "repo": "acme/checkout-frontend",
+    "status": "passed",
+    "checks": [
+      {"name": "unit-tests", "status": "passed", "duration_seconds": 38, "url": "https://ci.acme.com/checkout-frontend/runs/910"},
+      {"name": "e2e-tests", "status": "passed", "duration_seconds": 195, "url": "https://ci.acme.com/checkout-frontend/runs/910"},
+      {"name": "lint", "status": "passed", "duration_seconds": 9, "url": "https://ci.acme.com/checkout-frontend/runs/910"},
+      {"name": "type-check", "status": "passed", "duration_seconds": 16, "url": "https://ci.acme.com/checkout-frontend/runs/910"},
+      {"name": "bundle-size-check", "status": "passed", "duration_seconds": 24, "url": "https://ci.acme.com/checkout-frontend/runs/910"}
+    ],
+    "started_at": "2026-04-07T17:02:00Z",
+    "completed_at": "2026-04-07T17:06:45Z",
+    "commit_sha": "d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5"
+  },
+  {
+    "ref": "pr-114",
+    "repo": "acme/checkout-frontend",
+    "status": "passed",
+    "checks": [
+      {"name": "unit-tests", "status": "passed", "duration_seconds": 34, "url": "https://ci.acme.com/checkout-frontend/runs/905"},
+      {"name": "e2e-tests", "status": "passed", "duration_seconds": 188, "url": "https://ci.acme.com/checkout-frontend/runs/905"},
+      {"name": "lint", "status": "passed", "duration_seconds": 8, "url": "https://ci.acme.com/checkout-frontend/runs/905"},
+      {"name": "type-check", "status": "passed", "duration_seconds": 15, "url": "https://ci.acme.com/checkout-frontend/runs/905"},
+      {"name": "bundle-size-check", "status": "passed", "duration_seconds": 23, "url": "https://ci.acme.com/checkout-frontend/runs/905"}
+    ],
+    "started_at": "2026-04-07T12:02:00Z",
+    "completed_at": "2026-04-07T12:06:10Z",
+    "commit_sha": "f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7"
+  },
+  {
+    "ref": "pr-116",
+    "repo": "acme/checkout-frontend",
+    "status": "pending",
+    "checks": [
+      {"name": "unit-tests", "status": "pending", "duration_seconds": null, "url": "https://ci.acme.com/checkout-frontend/runs/915"},
+      {"name": "e2e-tests", "status": "pending", "duration_seconds": null, "url": "https://ci.acme.com/checkout-frontend/runs/915"},
+      {"name": "lint", "status": "pending", "duration_seconds": null, "url": "https://ci.acme.com/checkout-frontend/runs/915"},
+      {"name": "type-check", "status": "pending", "duration_seconds": null, "url": "https://ci.acme.com/checkout-frontend/runs/915"},
+      {"name": "bundle-size-check", "status": "pending", "duration_seconds": null, "url": "https://ci.acme.com/checkout-frontend/runs/915"}
+    ],
+    "started_at": null,
+    "completed_at": null,
+    "commit_sha": "a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8"
+  }
+]

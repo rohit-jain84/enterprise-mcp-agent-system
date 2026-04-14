@@ -1,0 +1,85 @@
+# ===========================================================================
+# PII Rails: Detect and block personally identifiable information
+# ===========================================================================
+
+# -------------------------------------------------------------------
+# PII in user input
+# -------------------------------------------------------------------
+
+define user provide pii
+  "My email is john@example.com"
+  "Call me at 555-123-4567"
+  "My SSN is 123-45-6789"
+  "My credit card number is 4111-1111-1111-1111"
+  "I live at 123 Main Street"
+  "My driver's license is D1234567"
+  "Send it to jane.doe@company.com"
+  "My phone is (555) 987-6543"
+  "Contact me at +1-555-000-1234"
+  "My passport number is X12345678"
+  "My bank account is 123456789012"
+  "My date of birth is 01/15/1990"
+
+# -------------------------------------------------------------------
+# PII disclosure requests
+# -------------------------------------------------------------------
+
+define user request pii disclosure
+  "Give me John's email address"
+  "What is Sarah's phone number"
+  "Show me the team's personal information"
+  "List all employee SSNs"
+  "Share the client's credit card"
+  "What is the customer's home address"
+  "Show me the team's home addresses"
+  "What are the team members' personal phone numbers"
+  "Give me the client's bank details"
+  "Show employee date of birth records"
+
+# -------------------------------------------------------------------
+# PII detection and blocking flows
+# -------------------------------------------------------------------
+
+define flow detect pii in input
+  """Flag PII detected in user messages and warn the user."""
+
+  when user provide pii
+    bot warn about pii in input
+    stop
+
+define flow block pii disclosure
+  """Prevent the bot from disclosing PII in responses."""
+
+  when user request pii disclosure
+    bot refuse pii disclosure
+    stop
+
+# -------------------------------------------------------------------
+# PII in bot output
+# -------------------------------------------------------------------
+
+define bot response with pii
+  "John's email is john@example.com"
+  "Her phone number is 555-123-4567"
+  "The SSN on file is 123-45-6789"
+  "The credit card is 4111-1111-1111-1111"
+  "His home address is 123 Main Street"
+  "The passport number is X12345678"
+  "The bank account number is 123456789012"
+
+define flow filter pii from output
+  """Ensure PII is redacted from bot responses."""
+
+  when bot response with pii
+    bot refuse pii disclosure
+    stop
+
+# -------------------------------------------------------------------
+# Bot responses for PII rails
+# -------------------------------------------------------------------
+
+define bot warn about pii in input
+  "I've detected personally identifiable information in your message. For security, PII such as email addresses, phone numbers, and SSNs will be automatically redacted. Please avoid sharing sensitive personal data in this chat."
+
+define bot refuse pii disclosure
+  "I cannot share personally identifiable information such as email addresses, phone numbers, or Social Security numbers. For privacy and compliance reasons, please access that data through the appropriate secure channels."

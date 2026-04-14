@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  github-mcp:
+    volumes:
+      - ../mcp_servers/github_server:/app
+    environment:
+      - LOG_LEVEL=debug
+
+  project-mgmt-mcp:
+    volumes:
+      - ../mcp_servers/project_management_server:/app
+    environment:
+      - LOG_LEVEL=debug
+
+  calendar-mcp:
+    volumes:
+      - ../mcp_servers/calendar_server:/app
+    environment:
+      - LOG_LEVEL=debug
+
+  backend:
+    volumes:
+      - ../backend:/app
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    environment:
+      - LOG_LEVEL=debug
+      - DEBUG=true
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  frontend:
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true

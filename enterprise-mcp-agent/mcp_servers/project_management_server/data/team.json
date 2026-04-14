@@ -1,0 +1,56 @@
+[
+  {
+    "username": "sarah.chen",
+    "full_name": "Sarah Chen",
+    "email": "sarah.chen@acme.com",
+    "role": "Senior Backend Engineer / Tech Lead",
+    "team": "Payments",
+    "capacity_points": 13,
+    "current_load": 8
+  },
+  {
+    "username": "marcus.johnson",
+    "full_name": "Marcus Johnson",
+    "email": "marcus.johnson@acme.com",
+    "role": "Senior Backend Engineer",
+    "team": "Payments",
+    "capacity_points": 13,
+    "current_load": 8
+  },
+  {
+    "username": "elena.rodriguez",
+    "full_name": "Elena Rodriguez",
+    "email": "elena.rodriguez@acme.com",
+    "role": "Senior Frontend Engineer",
+    "team": "Checkout",
+    "capacity_points": 13,
+    "current_load": 16
+  },
+  {
+    "username": "james.wilson",
+    "full_name": "James Wilson",
+    "email": "james.wilson@acme.com",
+    "role": "Full Stack Engineer",
+    "team": "Cross-team",
+    "capacity_points": 10,
+    "current_load": 11
+  },
+  {
+    "username": "priya.patel",
+    "full_name": "Priya Patel",
+    "email": "priya.patel@acme.com",
+    "role": "Full Stack Engineer",
+    "team": "Cross-team",
+    "capacity_points": 10,
+    "current_load": 13
+  },
+  {
+    "username": "alex.kumar",
+    "full_name": "Alex Kumar",
+    "email": "alex.kumar@acme.com",
+    "role": "Backend Engineer",
+    "team": "Payments",
+    "capacity_points": 10,
+    "current_load": 5
+  }
+]

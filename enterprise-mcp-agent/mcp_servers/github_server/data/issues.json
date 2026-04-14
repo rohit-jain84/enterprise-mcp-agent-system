@@ -1,0 +1,291 @@
+[
+  {
+    "id": 1001,
+    "number": 189,
+    "repo": "acme/payments-service",
+    "title": "Implement idempotent payment retry logic",
+    "body": "## Problem\nWhen network failures occur during payment processing, customers sometimes get charged twice because the retry logic doesn't check for existing successful charges.\n\n## Expected Behavior\nRetried payments should use an idempotency key to prevent duplicate charges.\n\n## Acceptance Criteria\n- [ ] Idempotency keys generated per payment attempt\n- [ ] Middleware checks for existing successful charges before processing\n- [ ] Retry backoff strategy implemented\n- [ ] Integration tests for all retry scenarios",
+    "state": "open",
+    "author": "sarah.chen",
+    "assignees": ["sarah.chen"],
+    "labels": ["feature", "payments-core", "high-priority"],
+    "created_at": "2026-03-20T10:00:00Z",
+    "updated_at": "2026-04-07T16:30:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "marcus.johnson", "body": "I've seen this happen in production logs about 3-4 times this week. Definitely needs to be addressed.", "created_at": "2026-03-20T14:00:00Z"},
+      {"author": "sarah.chen", "body": "PR #247 is up for review. I went with a Redis-backed idempotency key store with a 24h TTL.", "created_at": "2026-04-02T09:20:00Z"},
+      {"author": "elena.rodriguez", "body": "Left some comments on the PR about edge cases with key expiration during long-running transactions.", "created_at": "2026-04-07T14:25:00Z"}
+    ],
+    "linked_prs": [247],
+    "milestone": "Sprint 24"
+  },
+  {
+    "id": 1002,
+    "number": 201,
+    "repo": "acme/payments-service",
+    "title": "Race condition in concurrent refund processing",
+    "body": "## Bug Report\nTwo concurrent refund requests for the same transaction can both succeed, resulting in double refunds.\n\n## Steps to Reproduce\n1. Submit a refund request for transaction T1\n2. Immediately submit another refund request for T1 before the first completes\n3. Both requests succeed\n\n## Impact\nFinancial loss from double refunds. Identified 12 instances in the last month totaling $4,800.",
+    "state": "closed",
+    "author": "alex.kumar",
+    "assignees": ["marcus.johnson"],
+    "labels": ["bug", "critical", "payments-core"],
+    "created_at": "2026-03-26T08:00:00Z",
+    "updated_at": "2026-04-01T10:00:00Z",
+    "closed_at": "2026-04-01T10:00:00Z",
+    "comments": [
+      {"author": "marcus.johnson", "body": "Confirmed. The `RefundService.process()` method needs a distributed lock. Taking this on.", "created_at": "2026-03-26T10:00:00Z"},
+      {"author": "sarah.chen", "body": "Good catch. This is P0 until fixed.", "created_at": "2026-03-26T10:30:00Z"},
+      {"author": "marcus.johnson", "body": "Fix merged in PR #248. Deployed to staging for verification.", "created_at": "2026-04-01T10:05:00Z"}
+    ],
+    "linked_prs": [248],
+    "milestone": "Sprint 23"
+  },
+  {
+    "id": 1003,
+    "number": 210,
+    "repo": "acme/payments-service",
+    "title": "International payments fail with null currency code",
+    "body": "## Bug Report\n**Severity: P0**\n\nInternational payments submitted without an explicit currency code throw an unhandled NullPointerException in the payment validator. The error surfaces as a generic 500 to the user.\n\n## Steps to Reproduce\n1. Initiate a payment to an international recipient\n2. Omit the `currency_code` field in the request\n3. Server returns HTTP 500 instead of 400 validation error\n\n## Expected Behavior\nA 400 response with a clear message: 'currency_code is required for international payments'\n\n## Impact\nAffecting ~2% of international payment attempts. Approximately 150 failed transactions/day.",
+    "state": "open",
+    "author": "james.wilson",
+    "assignees": ["james.wilson"],
+    "labels": ["bug", "P0", "payments-core", "international"],
+    "created_at": "2026-04-06T07:00:00Z",
+    "updated_at": "2026-04-08T08:00:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "sarah.chen", "body": "This is a P0. James, can you take this? We need a fix today.", "created_at": "2026-04-06T08:00:00Z"},
+      {"author": "james.wilson", "body": "On it. Root cause identified - the validator doesn't check for null before accessing `currency_code.upper()`. PR incoming.", "created_at": "2026-04-07T10:00:00Z"},
+      {"author": "james.wilson", "body": "PR #251 is up with the fix and tests. Both Sarah and Marcus have approved.", "created_at": "2026-04-08T08:05:00Z"},
+      {"author": "priya.patel", "body": "Confirmed the fix works in staging. The 500 errors have stopped for the test cases.", "created_at": "2026-04-08T09:00:00Z"}
+    ],
+    "linked_prs": [251],
+    "milestone": "Sprint 24"
+  },
+  {
+    "id": 1004,
+    "number": 211,
+    "repo": "acme/payments-service",
+    "title": "Upgrade Stripe SDK to v12",
+    "body": "Stripe SDK v10 is approaching end of support. We need to upgrade to v12 which has breaking changes around the Charge/PaymentIntent API surface.",
+    "state": "open",
+    "author": "alex.kumar",
+    "assignees": ["alex.kumar"],
+    "labels": ["chore", "dependencies"],
+    "created_at": "2026-04-03T09:00:00Z",
+    "updated_at": "2026-04-07T09:15:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "alex.kumar", "body": "PR #249 is up but CI is failing on the webhook handler tests. Need to update the test fixtures for the new event format.", "created_at": "2026-04-07T09:20:00Z"}
+    ],
+    "linked_prs": [249],
+    "milestone": "Sprint 24"
+  },
+  {
+    "id": 1005,
+    "number": 212,
+    "repo": "acme/payments-service",
+    "title": "Add structured logging to payment pipeline",
+    "body": "Replace print-based logging with structured JSON logging throughout the payment processing pipeline. This will improve observability in our ELK stack.",
+    "state": "open",
+    "author": "priya.patel",
+    "assignees": [],
+    "labels": ["improvement", "observability"],
+    "created_at": "2026-04-04T14:00:00Z",
+    "updated_at": "2026-04-04T14:00:00Z",
+    "closed_at": null,
+    "comments": [],
+    "linked_prs": [],
+    "milestone": null
+  },
+  {
+    "id": 1006,
+    "number": 213,
+    "repo": "acme/payments-service",
+    "title": "Support multi-currency settlement accounts",
+    "body": "As we expand internationally, merchants need the ability to hold balances and settle in multiple currencies from a single account.",
+    "state": "open",
+    "author": "sarah.chen",
+    "assignees": [],
+    "labels": ["feature", "international", "P2"],
+    "created_at": "2026-04-05T11:00:00Z",
+    "updated_at": "2026-04-05T11:00:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "marcus.johnson", "body": "This is a big one. Should we break it into sub-tasks?", "created_at": "2026-04-05T14:00:00Z"}
+    ],
+    "linked_prs": [],
+    "milestone": null
+  },
+  {
+    "id": 1007,
+    "number": 214,
+    "repo": "acme/payments-service",
+    "title": "Payment webhook delivery fails silently after timeout",
+    "body": "When webhook delivery to merchants times out, we silently drop the event without logging or retrying. Merchants are missing payment confirmation notifications.",
+    "state": "open",
+    "author": "marcus.johnson",
+    "assignees": ["marcus.johnson"],
+    "labels": ["bug", "P1", "webhooks"],
+    "created_at": "2026-04-06T15:00:00Z",
+    "updated_at": "2026-04-07T09:00:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "sarah.chen", "body": "Can we add this to Sprint 24? It's affecting merchant satisfaction.", "created_at": "2026-04-06T16:00:00Z"},
+      {"author": "marcus.johnson", "body": "Added to the sprint. Will implement a retry queue with exponential backoff.", "created_at": "2026-04-07T09:00:00Z"}
+    ],
+    "linked_prs": [],
+    "milestone": "Sprint 24"
+  },
+  {
+    "id": 1008,
+    "number": 215,
+    "repo": "acme/payments-service",
+    "title": "Build payment analytics dashboard API",
+    "body": "Create REST API endpoints for the new payment analytics dashboard. Should provide aggregated metrics for volume, success rates, and latency.",
+    "state": "open",
+    "author": "priya.patel",
+    "assignees": ["priya.patel"],
+    "labels": ["feature", "analytics"],
+    "created_at": "2026-04-01T10:00:00Z",
+    "updated_at": "2026-04-07T15:45:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "priya.patel", "body": "Draft PR #250 is up with the initial volume endpoint. Still working on success rate and latency endpoints.", "created_at": "2026-04-07T08:00:00Z"}
+    ],
+    "linked_prs": [250],
+    "milestone": "Sprint 24"
+  },
+  {
+    "id": 2001,
+    "number": 41,
+    "repo": "acme/checkout-frontend",
+    "title": "Cart total calculation wrong with discount codes",
+    "body": "## Bug Report\nWhen a percentage-based discount code is applied to a cart with items at different tax rates, the total is incorrect. The discount is being applied after tax instead of before.",
+    "state": "closed",
+    "author": "elena.rodriguez",
+    "assignees": ["priya.patel"],
+    "labels": ["bug", "billing", "checkout"],
+    "created_at": "2026-03-28T11:00:00Z",
+    "updated_at": "2026-04-02T11:30:00Z",
+    "closed_at": "2026-04-02T11:30:00Z",
+    "comments": [
+      {"author": "priya.patel", "body": "Reproduced. The issue is in `calculateTotal()` - discount should be applied to subtotal before tax calculation.", "created_at": "2026-03-29T09:00:00Z"},
+      {"author": "priya.patel", "body": "Fixed in PR #113.", "created_at": "2026-04-01T10:00:00Z"}
+    ],
+    "linked_prs": [113],
+    "milestone": "Sprint 23"
+  },
+  {
+    "id": 2002,
+    "number": 45,
+    "repo": "acme/checkout-frontend",
+    "title": "Redesign checkout flow with multi-step wizard",
+    "body": "The current single-page checkout is overwhelming for users. Redesign as a multi-step wizard with clear progress indication.\n\nDesign spec: [Figma link]\n\n## Steps\n1. Cart review\n2. Shipping info\n3. Payment method\n4. Confirmation",
+    "state": "open",
+    "author": "elena.rodriguez",
+    "assignees": ["elena.rodriguez"],
+    "labels": ["feature", "ux-redesign", "checkout"],
+    "created_at": "2026-03-22T09:00:00Z",
+    "updated_at": "2026-04-07T17:00:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "james.wilson", "body": "Please make sure we address a11y from the start - focus management between steps is critical.", "created_at": "2026-03-22T14:00:00Z"},
+      {"author": "elena.rodriguez", "body": "PR #112 is up. James, I'll address your accessibility feedback in the next revision.", "created_at": "2026-04-07T17:00:00Z"}
+    ],
+    "linked_prs": [112],
+    "milestone": "Sprint 24"
+  },
+  {
+    "id": 2003,
+    "number": 48,
+    "repo": "acme/checkout-frontend",
+    "title": "Add Apple Pay and Google Pay support",
+    "body": "Integrate Apple Pay and Google Pay using the Payment Request API for a streamlined mobile checkout experience.",
+    "state": "open",
+    "author": "james.wilson",
+    "assignees": ["james.wilson"],
+    "labels": ["feature", "payments", "mobile"],
+    "created_at": "2026-04-01T08:00:00Z",
+    "updated_at": "2026-04-07T12:00:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "elena.rodriguez", "body": "Approved the PR. Clean implementation!", "created_at": "2026-04-07T11:35:00Z"}
+    ],
+    "linked_prs": [114],
+    "milestone": "Sprint 24"
+  },
+  {
+    "id": 2004,
+    "number": 50,
+    "repo": "acme/checkout-frontend",
+    "title": "Performance: reduce initial bundle size below 200KB",
+    "body": "Current initial bundle is 340KB gzipped. Target: under 200KB through code splitting, tree shaking, and lazy loading non-critical components.",
+    "state": "open",
+    "author": "alex.kumar",
+    "assignees": [],
+    "labels": ["improvement", "performance"],
+    "created_at": "2026-04-03T15:00:00Z",
+    "updated_at": "2026-04-03T15:00:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "priya.patel", "body": "The Vite migration (PR #115) already dropped us to ~280KB. Dynamic imports for the checkout wizard should get us the rest of the way.", "created_at": "2026-04-04T09:00:00Z"}
+    ],
+    "linked_prs": [],
+    "milestone": null
+  },
+  {
+    "id": 2005,
+    "number": 51,
+    "repo": "acme/checkout-frontend",
+    "title": "Add E2E tests for checkout flow",
+    "body": "We currently have no E2E tests for the checkout flow. Add Playwright tests covering the critical path:\n- Add to cart -> checkout -> payment -> confirmation\n- Apply discount code\n- Error handling (payment failure, network timeout)",
+    "state": "open",
+    "author": "priya.patel",
+    "assignees": ["priya.patel"],
+    "labels": ["testing", "checkout"],
+    "created_at": "2026-04-05T10:00:00Z",
+    "updated_at": "2026-04-05T10:00:00Z",
+    "closed_at": null,
+    "comments": [],
+    "linked_prs": [],
+    "milestone": "Sprint 25"
+  },
+  {
+    "id": 2006,
+    "number": 52,
+    "repo": "acme/checkout-frontend",
+    "title": "Shipping address form loses state on browser back",
+    "body": "When a user fills in the shipping address form, navigates to the payment step, then hits browser back, all form data is lost. Should persist form state in session storage.",
+    "state": "open",
+    "author": "elena.rodriguez",
+    "assignees": ["elena.rodriguez"],
+    "labels": ["bug", "ux", "checkout"],
+    "created_at": "2026-04-07T15:30:00Z",
+    "updated_at": "2026-04-07T16:30:00Z",
+    "closed_at": null,
+    "comments": [
+      {"author": "elena.rodriguez", "body": "Draft PR #116 is up. Testing the session storage approach.", "created_at": "2026-04-07T16:35:00Z"}
+    ],
+    "linked_prs": [116],
+    "milestone": "Sprint 24"
+  },
+  {
+    "id": 2007,
+    "number": 53,
+    "repo": "acme/checkout-frontend",
+    "title": "Add dark mode support",
+    "body": "Implement dark mode using CSS custom properties and a theme toggle. Should respect system preference by default.",
+    "state": "open",
+    "author": "alex.kumar",
+    "assignees": [],
+    "labels": ["feature", "ux", "P3"],
+    "created_at": "2026-04-06T12:00:00Z",
+    "updated_at": "2026-04-06T12:00:00Z",
+    "closed_at": null,
+    "comments": [],
+    "linked_prs": [],
+    "milestone": null
+  }
+]

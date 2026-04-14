@@ -1,0 +1,74 @@
+[
+  {
+    "sprint_id": "PAYMENTS-S20",
+    "sprint_name": "Payments Sprint 20",
+    "project": "PAYMENTS",
+    "committed_points": 30,
+    "completed_points": 28,
+    "carry_over_points": 2
+  },
+  {
+    "sprint_id": "PAYMENTS-S21",
+    "sprint_name": "Payments Sprint 21",
+    "project": "PAYMENTS",
+    "committed_points": 35,
+    "completed_points": 30,
+    "carry_over_points": 5
+  },
+  {
+    "sprint_id": "PAYMENTS-S22",
+    "sprint_name": "Payments Sprint 22",
+    "project": "PAYMENTS",
+    "committed_points": 34,
+    "completed_points": 29,
+    "carry_over_points": 5
+  },
+  {
+    "sprint_id": "PAYMENTS-S23",
+    "sprint_name": "Payments Sprint 23",
+    "project": "PAYMENTS",
+    "committed_points": 38,
+    "completed_points": 32,
+    "carry_over_points": 6
+  },
+  {
+    "sprint_id": "PAYMENTS-S24",
+    "sprint_name": "Payments Sprint 24",
+    "project": "PAYMENTS",
+    "committed_points": 42,
+    "completed_points": 8,
+    "carry_over_points": 0
+  },
+  {
+    "sprint_id": "CHECKOUT-S9",
+    "sprint_name": "Checkout Sprint 9",
+    "project": "CHECKOUT",
+    "committed_points": 21,
+    "completed_points": 21,
+    "carry_over_points": 0
+  },
+  {
+    "sprint_id": "CHECKOUT-S10",
+    "sprint_name": "Checkout Sprint 10",
+    "project": "CHECKOUT",
+    "committed_points": 28,
+    "completed_points": 24,
+    "carry_over_points": 4
+  },
+  {
+    "sprint_id": "CHECKOUT-S11",
+    "sprint_name": "Checkout Sprint 11",
+    "project": "CHECKOUT",
+    "committed_points": 26,
+    "completed_points": 26,
+    "carry_over_points": 0
+  },
+  {
+    "sprint_id": "CHECKOUT-S12",
+    "sprint_name": "Checkout Sprint 12",
+    "project": "CHECKOUT",
+    "committed_points": 34,
+    "completed_points": 5,
+    "carry_over_points": 0
+  }
+]

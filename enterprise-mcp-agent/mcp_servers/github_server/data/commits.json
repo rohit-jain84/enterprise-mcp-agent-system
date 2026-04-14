@@ -1,0 +1,211 @@
+[
+  {
+    "sha": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+    "repo": "acme/payments-service",
+    "branch": "main",
+    "message": "fix: resolve race condition in concurrent refund processing (#248)",
+    "author": "marcus.johnson",
+    "timestamp": "2026-04-01T10:00:00Z",
+    "additions": 234,
+    "deletions": 18,
+    "files_changed": ["src/services/refund.py", "src/locks/distributed.py", "tests/integration/test_refund_concurrent.py"]
+  },
+  {
+    "sha": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1",
+    "repo": "acme/payments-service",
+    "branch": "feat/payment-retry-idempotency",
+    "message": "feat: add IdempotencyKeyMiddleware to request pipeline",
+    "author": "sarah.chen",
+    "timestamp": "2026-04-02T09:15:00Z",
+    "additions": 285,
+    "deletions": 5,
+    "files_changed": ["src/middleware/idempotency.py", "src/middleware/__init__.py", "src/config/middleware.py"]
+  },
+  {
+    "sha": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+    "repo": "acme/payments-service",
+    "branch": "feat/payment-retry-idempotency",
+    "message": "feat: add payment_attempts table and retry logic",
+    "author": "sarah.chen",
+    "timestamp": "2026-04-03T14:30:00Z",
+    "additions": 145,
+    "deletions": 12,
+    "files_changed": ["src/models/payment_attempt.py", "src/processors/payment.py", "migrations/0042_payment_attempts.py"]
+  },
+  {
+    "sha": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3",
+    "repo": "acme/payments-service",
+    "branch": "feat/payment-retry-idempotency",
+    "message": "test: add comprehensive retry scenario tests",
+    "author": "sarah.chen",
+    "timestamp": "2026-04-04T16:00:00Z",
+    "additions": 57,
+    "deletions": 6,
+    "files_changed": ["tests/unit/test_idempotency.py", "tests/integration/test_payment_retry.py"]
+  },
+  {
+    "sha": "e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4",
+    "repo": "acme/payments-service",
+    "branch": "chore/stripe-v12-upgrade",
+    "message": "chore: upgrade stripe SDK from v10 to v12",
+    "author": "alex.kumar",
+    "timestamp": "2026-04-04T11:00:00Z",
+    "additions": 45,
+    "deletions": 38,
+    "files_changed": ["requirements.txt", "src/integrations/stripe_client.py"]
+  },
+  {
+    "sha": "f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5",
+    "repo": "acme/payments-service",
+    "branch": "chore/stripe-v12-upgrade",
+    "message": "chore: migrate Charge API to PaymentIntent API",
+    "author": "alex.kumar",
+    "timestamp": "2026-04-05T09:30:00Z",
+    "additions": 178,
+    "deletions": 162,
+    "files_changed": ["src/integrations/stripe_client.py", "src/services/payment_gateway.py", "src/webhooks/stripe_handler.py"]
+  },
+  {
+    "sha": "a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6",
+    "repo": "acme/payments-service",
+    "branch": "chore/stripe-v12-upgrade",
+    "message": "test: update webhook handler tests for Stripe v12 events",
+    "author": "alex.kumar",
+    "timestamp": "2026-04-06T14:00:00Z",
+    "additions": 89,
+    "deletions": 89,
+    "files_changed": ["tests/unit/test_stripe_webhooks.py", "tests/fixtures/stripe_events.json"]
+  },
+  {
+    "sha": "b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7",
+    "repo": "acme/payments-service",
+    "branch": "fix/null-currency-international",
+    "message": "fix: validate currency_code before accessing in international payments",
+    "author": "james.wilson",
+    "timestamp": "2026-04-07T10:30:00Z",
+    "additions": 42,
+    "deletions": 2,
+    "files_changed": ["src/validators/payment.py", "tests/unit/test_payment_validator.py"]
+  },
+  {
+    "sha": "c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8",
+    "repo": "acme/payments-service",
+    "branch": "fix/null-currency-international",
+    "message": "test: add edge case tests for international payment validation",
+    "author": "james.wilson",
+    "timestamp": "2026-04-07T14:00:00Z",
+    "additions": 25,
+    "deletions": 2,
+    "files_changed": ["tests/unit/test_payment_validator.py", "tests/integration/test_international_payments.py"]
+  },
+  {
+    "sha": "d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9",
+    "repo": "acme/payments-service",
+    "branch": "feat/analytics-api",
+    "message": "feat: add payment volume analytics endpoint",
+    "author": "priya.patel",
+    "timestamp": "2026-04-07T08:00:00Z",
+    "additions": 98,
+    "deletions": 0,
+    "files_changed": ["src/api/analytics.py", "src/services/analytics.py", "src/api/__init__.py"]
+  },
+  {
+    "sha": "e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0",
+    "repo": "acme/payments-service",
+    "branch": "feat/analytics-api",
+    "message": "feat: add success rate and latency analytics endpoints",
+    "author": "priya.patel",
+    "timestamp": "2026-04-07T15:45:00Z",
+    "additions": 58,
+    "deletions": 0,
+    "files_changed": ["src/api/analytics.py", "src/services/analytics.py"]
+  },
+  {
+    "sha": "f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1",
+    "repo": "acme/checkout-frontend",
+    "branch": "main",
+    "message": "chore: migrate from Webpack to Vite (#115)",
+    "author": "alex.kumar",
+    "timestamp": "2026-03-29T14:00:00Z",
+    "additions": 156,
+    "deletions": 423,
+    "files_changed": ["vite.config.ts", "package.json", "tsconfig.json"]
+  },
+  {
+    "sha": "a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+    "repo": "acme/checkout-frontend",
+    "branch": "main",
+    "message": "fix: cart total calculation wrong with discount codes (#113)",
+    "author": "priya.patel",
+    "timestamp": "2026-04-02T11:30:00Z",
+    "additions": 89,
+    "deletions": 34,
+    "files_changed": ["src/utils/pricing.ts", "src/utils/__tests__/pricing.test.ts"]
+  },
+  {
+    "sha": "b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3",
+    "repo": "acme/checkout-frontend",
+    "branch": "feat/checkout-wizard-redesign",
+    "message": "feat: implement CheckoutWizard component with step navigation",
+    "author": "elena.rodriguez",
+    "timestamp": "2026-04-01T13:00:00Z",
+    "additions": 420,
+    "deletions": 180,
+    "files_changed": ["src/components/CheckoutWizard/index.tsx", "src/components/CheckoutWizard/ProgressBar.tsx", "src/components/CheckoutWizard/steps/CartReview.tsx"]
+  },
+  {
+    "sha": "c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4",
+    "repo": "acme/checkout-frontend",
+    "branch": "feat/checkout-wizard-redesign",
+    "message": "feat: add animated transitions and form validation to wizard steps",
+    "author": "elena.rodriguez",
+    "timestamp": "2026-04-04T16:30:00Z",
+    "additions": 312,
+    "deletions": 156,
+    "files_changed": ["src/components/CheckoutWizard/transitions.ts", "src/components/CheckoutWizard/steps/ShippingInfo.tsx", "src/components/CheckoutWizard/steps/PaymentMethod.tsx"]
+  },
+  {
+    "sha": "d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+    "repo": "acme/checkout-frontend",
+    "branch": "feat/checkout-wizard-redesign",
+    "message": "feat: add confirmation step and order summary",
+    "author": "elena.rodriguez",
+    "timestamp": "2026-04-07T17:00:00Z",
+    "additions": 160,
+    "deletions": 120,
+    "files_changed": ["src/components/CheckoutWizard/steps/Confirmation.tsx", "src/components/CheckoutWizard/OrderSummary.tsx"]
+  },
+  {
+    "sha": "e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6",
+    "repo": "acme/checkout-frontend",
+    "branch": "feat/apple-google-pay",
+    "message": "feat: add Payment Request API wrapper for Apple Pay / Google Pay",
+    "author": "james.wilson",
+    "timestamp": "2026-04-03T10:00:00Z",
+    "additions": 210,
+    "deletions": 5,
+    "files_changed": ["src/components/PaymentMethods/WalletPay.tsx", "src/hooks/usePaymentRequest.ts"]
+  },
+  {
+    "sha": "f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7",
+    "repo": "acme/checkout-frontend",
+    "branch": "feat/apple-google-pay",
+    "message": "feat: add wallet pay button variants and error handling",
+    "author": "james.wilson",
+    "timestamp": "2026-04-06T11:00:00Z",
+    "additions": 135,
+    "deletions": 7,
+    "files_changed": ["src/components/PaymentMethods/WalletPay.tsx", "src/components/PaymentMethods/WalletPayButton.tsx", "src/components/PaymentMethods/__tests__/WalletPay.test.tsx"]
+  },
+  {
+    "sha": "a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+    "repo": "acme/checkout-frontend",
+    "branch": "fix/form-state-persistence",
+    "message": "fix: persist shipping form state in session storage",
+    "author": "elena.rodriguez",
+    "timestamp": "2026-04-07T16:00:00Z",
+    "additions": 45,
+    "deletions": 8,
+    "files_changed": ["src/hooks/useFormPersistence.ts", "src/components/CheckoutWizard/steps/ShippingInfo.tsx"]
+  }
+]
