@@ -34,48 +34,48 @@ services:
 
   github-mcp:
     build:
-      context: ../mcp_servers/github_server
-      dockerfile: Dockerfile
+      context: ../mcp_servers
+      dockerfile: github_server/Dockerfile
     restart: unless-stopped
     ports:
-      - "8001:8001"
+      - "9001:8001"
     env_file:
       - ../.env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      test: ["CMD-SHELL", "python -c \"import socket; s=socket.create_connection(('localhost',8001),2); s.close()\""]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
 
   project-mgmt-mcp:
     build:
-      context: ../mcp_servers/project_management_server
-      dockerfile: Dockerfile
+      context: ../mcp_servers
+      dockerfile: project_management_server/Dockerfile
     restart: unless-stopped
     ports:
-      - "8002:8002"
+      - "9002:8002"
     env_file:
       - ../.env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      test: ["CMD-SHELL", "python -c \"import socket; s=socket.create_connection(('localhost',8002),2); s.close()\""]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
 
   calendar-mcp:
     build:
-      context: ../mcp_servers/calendar_server
-      dockerfile: Dockerfile
+      context: ../mcp_servers
+      dockerfile: calendar_server/Dockerfile
     restart: unless-stopped
     ports:
-      - "8003:8003"
+      - "9003:8003"
     env_file:
       - ../.env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      test: ["CMD-SHELL", "python -c \"import socket; s=socket.create_connection(('localhost',8003),2); s.close()\""]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
 
   backend:
     build:
@@ -86,6 +86,13 @@ services:
       - "8000:8000"
     env_file:
       - ../.env
+    environment:
+      # Override hostnames to use Docker Compose service names
+      DATABASE_URL: postgresql+asyncpg://agent:agent_dev@postgres:5432/agent_db
+      REDIS_URL: redis://redis:6379/0
+      GITHUB_MCP_URL: http://github-mcp:8001
+      PROJECT_MGMT_MCP_URL: http://project-mgmt-mcp:8002
+      CALENDAR_MCP_URL: http://calendar-mcp:8003
     depends_on:
       postgres:
         condition: service_healthy
@@ -105,6 +112,8 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    environment:
+      VITE_BACKEND_URL: http://backend:8000
     env_file:
       - ../.env
     depends_on:

@@ -1,0 +1,185 @@
+# ===========================================================================
+# Topic Boundary Rails: Enforce allowed/disallowed topic domains
+# ===========================================================================
+
+# -------------------------------------------------------------------
+# Allowed topic definitions (detailed)
+# -------------------------------------------------------------------
+
+define user ask allowed topic
+  "Help me with project management"
+  "I need help with software engineering"
+  "Show me GitHub pull requests"
+  "Check my Jira board"
+  "Show my calendar"
+  "What's the team status?"
+  "How is the sprint going?"
+  "Show me open tickets"
+  "List open pull requests"
+  "What issues are assigned to me?"
+  "When is the next meeting?"
+  "Show sprint burndown"
+  "What are the blockers?"
+  "Who is reviewing my PR?"
+  "Update the ticket status"
+  "Create a new issue"
+  "Schedule a team meeting"
+  "Check deployment status"
+  "Show recent commits"
+  "What's the release schedule?"
+  "Help me plan the sprint"
+  "What's the test coverage?"
+  "Run the CI pipeline"
+  "Review the pull request"
+  "Create a feature branch"
+  "What's the code review status?"
+  "Show me the deployment history"
+
+define user ask about project management topics
+  "Sprint planning"
+  "Backlog grooming"
+  "Story points estimation"
+  "Release planning"
+  "Velocity tracking"
+  "Kanban board"
+  "Scrum ceremony"
+  "Retrospective notes"
+  "Daily standup"
+  "Epic breakdown"
+  "Sprint review preparation"
+  "Definition of done"
+  "Acceptance criteria"
+  "User story mapping"
+  "Risk assessment for the project"
+  "Stakeholder update"
+  "Milestone tracking"
+  "Dependency management"
+  "Capacity planning"
+
+define user ask about engineering topics
+  "Code review best practices"
+  "CI/CD pipeline"
+  "Deployment strategy"
+  "Branch management"
+  "Testing strategy"
+  "Architecture review"
+  "Tech debt tracking"
+  "Performance monitoring"
+  "Incident response"
+  "On-call schedule"
+  "Feature flag management"
+  "Database migration plan"
+  "API versioning"
+  "Monitoring and alerting"
+  "Load testing results"
+  "Security review checklist"
+  "Code quality metrics"
+  "Regression testing"
+
+define user ask about ticket management
+  "Create a new ticket"
+  "Update ticket status"
+  "Assign a ticket"
+  "Set ticket priority"
+  "Link related tickets"
+  "Add subtasks"
+  "Move ticket to sprint"
+  "Close the ticket"
+  "Add labels to the issue"
+  "Estimate story points"
+  "Triage incoming bugs"
+  "Create an incident ticket"
+  "Track ticket resolution time"
+
+define user ask about scheduling
+  "Find a free time slot"
+  "Schedule a one-on-one"
+  "Set up a recurring meeting"
+  "Check room availability"
+  "Block calendar time"
+  "Send a meeting invite"
+  "Update meeting agenda"
+  "Cancel a recurring meeting"
+  "Check team availability"
+  "Schedule a demo"
+
+# -------------------------------------------------------------------
+# Explicitly disallowed topic definitions
+# -------------------------------------------------------------------
+
+define user ask unrelated topic
+  "What's the stock market doing?"
+  "Help me plan a vacation"
+  "Write a novel for me"
+  "What's your opinion on politics?"
+  "Tell me a bedtime story"
+  "Play chess with me"
+  "Help me with my taxes"
+  "What's the best programming language?"
+  "Who will win the election?"
+  "Generate art for me"
+  "Translate this to French"
+  "Summarize this Wikipedia article"
+  "What's the best phone to buy?"
+  "Help me write a personal blog"
+  "What are the best travel destinations?"
+  "Explain cryptocurrency to me"
+  "Help me learn a new language"
+  "What's trending on social media?"
+  "Help me write a song"
+  "What's the best workout routine?"
+
+define user ask about forbidden professional advice
+  "What stocks should I buy?"
+  "Do I need a lawyer?"
+  "Should I take this medication?"
+  "How should I structure my trust fund?"
+  "Is this legal in my state?"
+  "What insurance do I need?"
+  "Should I file a complaint?"
+  "What are my legal rights here?"
+  "How should I negotiate my salary?"
+  "What tax deductions can I claim?"
+
+# -------------------------------------------------------------------
+# Topic boundary enforcement flow
+# -------------------------------------------------------------------
+
+define flow enforce topic boundaries
+  """Enforce allowed topic boundaries for all user messages."""
+
+  when user ask allowed topic
+    bot acknowledge and assist
+
+  when user ask about project management topics
+    bot acknowledge and assist
+
+  when user ask about engineering topics
+    bot acknowledge and assist
+
+  when user ask about ticket management
+    bot acknowledge and assist
+
+  when user ask about scheduling
+    bot acknowledge and assist
+
+  when user ask unrelated topic
+    bot politely decline unrelated
+    stop
+
+  when user ask about forbidden professional advice
+    bot decline professional advice
+    stop
+
+# -------------------------------------------------------------------
+# Bot responses for topic enforcement
+# -------------------------------------------------------------------
+
+define bot acknowledge and assist
+  "Sure, I can help with that. Let me look into it for you."
+
+define bot politely decline unrelated
+  "I appreciate your question, but I'm specifically designed to help with development workflow tasks. I can help you with GitHub operations, project management, Jira ticket management, calendar scheduling, and team coordination. Could I help you with any of those instead?"
+
+define bot decline professional advice
+  "I'm not qualified to provide medical, legal, or financial advice. Please consult the appropriate professional. I can help you with software development workflow, project management, GitHub, Jira, and calendar operations. What would you like to work on?"

@@ -134,19 +134,58 @@ async def run_agent(task: dict[str, Any]) -> dict[str, Any]:
     """Run a single evaluation task through the agent.
 
     Attempts to import and invoke the real agent graph.  Falls back to the
-    mock runner if the agent is not available.
+    mock runner if the agent is not available (e.g. missing DB, API key).
 
     Returns a dict with keys: response, tool_calls, cost_usd.
     """
     try:
-        # Try importing the real agent graph
-        from app.agent.state import AgentState
-        from langgraph.graph import StateGraph
+        from app.agent.graph import run_agent as invoke_agent
 
-        # Placeholder -- the real invocation will be wired to the compiled
-        # graph once the agent nodes are fully implemented.
-        raise ImportError("Agent graph not yet wired for eval")
-    except ImportError:
+        # Use a deterministic session/user id for eval runs.
+        session_id = f"eval-{task['id']}-{task['category'].lower()}"
+        user_id = "eval-runner"
+
+        # Configure error injection if the task specifies it.
+        error_injection = task.get("error_injection")
+        if error_injection:
+            import os
+            os.environ["MCP_ERROR_INJECTION"] = json.dumps(error_injection)
+
+        result = await invoke_agent(
+            session_id=session_id,
+            user_id=user_id,
+            user_message=task["input"],
+        )
+
+        # Clean up error injection env var.
+        if error_injection:
+            os.environ.pop("MCP_ERROR_INJECTION", None)
+
+        # Extract the assistant response from the final state.
+        messages = result.get("messages", [])
+        response_text = ""
+        for msg in reversed(messages):
+            if hasattr(msg, "type") and msg.type == "ai":
+                response_text = msg.content
+                break
+            elif hasattr(msg, "role") and getattr(msg, "role", None) == "assistant":
+                response_text = getattr(msg, "content", "")
+                break
+
+        # Collect tool call names from results.
+        tool_calls = [
+            tr.get("tool", tr.get("tool_name", "unknown"))
+            for tr in result.get("tool_results", [])
+        ]
+
+        return {
+            "response": response_text,
+            "tool_calls": tool_calls,
+            "cost_usd": result.get("total_cost_usd", 0.0),
+        }
+
+    except Exception as exc:
+        logger.warning("Real agent unavailable (%s), falling back to mock", exc)
         return await _run_agent_mock(task)
 
 

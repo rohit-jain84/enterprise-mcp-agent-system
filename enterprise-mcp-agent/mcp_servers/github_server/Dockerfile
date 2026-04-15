@@ -2,13 +2,13 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY github_server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY shared/ ./shared/
+COPY github_server/ ./github_server/
 
-# Also install the shared module
-COPY ../shared /app/shared
+WORKDIR /app/github_server
 
 EXPOSE 8001
 

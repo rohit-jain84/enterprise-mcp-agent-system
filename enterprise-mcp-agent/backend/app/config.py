@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     )
 
     # --- Database ---
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/enterprise_mcp"
+    DATABASE_URL: str = "postgresql+asyncpg://agent:agent_dev@localhost:5432/agent_db"
 
     # --- Redis ---
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -26,13 +26,13 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 60
 
-    # --- Anthropic ---
-    ANTHROPIC_API_KEY: str = ""
+    # --- OpenAI ---
+    OPENAI_API_KEY: str = ""
 
     # --- MCP Server URLs ---
-    GITHUB_MCP_URL: str = "http://localhost:8100"
-    PROJECT_MGMT_MCP_URL: str = "http://localhost:8101"
-    CALENDAR_MCP_URL: str = "http://localhost:8102"
+    GITHUB_MCP_URL: str = "http://localhost:8001"
+    PROJECT_MGMT_MCP_URL: str = "http://localhost:8002"
+    CALENDAR_MCP_URL: str = "http://localhost:8003"
 
     # --- LangChain / LangSmith ---
     LANGCHAIN_TRACING_V2: bool = False

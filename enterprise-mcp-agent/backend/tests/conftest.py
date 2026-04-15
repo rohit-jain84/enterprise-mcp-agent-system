@@ -26,7 +26,7 @@ def _test_settings() -> Settings:
         DATABASE_URL="sqlite+aiosqlite:///./test.db",
         REDIS_URL="redis://localhost:6379/15",
         JWT_SECRET_KEY="test-secret-key",
-        ANTHROPIC_API_KEY="test-key",
+        OPENAI_API_KEY="test-key",
         LANGCHAIN_TRACING_V2=False,
         GUARDRAILS_ENABLED=False,
         DEBUG=True,

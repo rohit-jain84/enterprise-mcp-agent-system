@@ -1,4 +1,4 @@
-"""Router node -- classifies user intent via Claude Haiku."""
+"""Router node -- classifies user intent via GPT-4o-mini."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import json
 import logging
 from typing import Any
 
-from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from app.agent.prompts import ROUTER_FEW_SHOT, ROUTER_SYSTEM_PROMPT
@@ -15,9 +15,9 @@ from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
-# Cost per token for Haiku (rough estimates for tracking).
-_HAIKU_INPUT_COST = 0.25 / 1_000_000   # $0.25 per 1M input tokens
-_HAIKU_OUTPUT_COST = 1.25 / 1_000_000   # $1.25 per 1M output tokens
+# Cost per token for GPT-4o-mini (rough estimates for tracking).
+_GPT4O_MINI_INPUT_COST = 0.15 / 1_000_000   # $0.15 per 1M input tokens
+_GPT4O_MINI_OUTPUT_COST = 0.60 / 1_000_000   # $0.60 per 1M output tokens
 
 
 def _build_few_shot_messages() -> list[HumanMessage | AIMessage]:
@@ -38,9 +38,9 @@ async def router_node(state: AgentState) -> dict[str, Any]:
     containing the raw classification JSON.
     """
     settings = get_settings()
-    llm = ChatAnthropic(
-        model="claude-haiku-4-20250414",
-        api_key=settings.ANTHROPIC_API_KEY,
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        api_key=settings.OPENAI_API_KEY,
         max_tokens=256,
         temperature=0.0,
     )
@@ -91,8 +91,8 @@ async def router_node(state: AgentState) -> dict[str, Any]:
         "total_tokens_input": state.get("total_tokens_input", 0) + input_tokens,
         "total_tokens_output": state.get("total_tokens_output", 0) + output_tokens,
         "total_cost_usd": state.get("total_cost_usd", 0.0)
-        + input_tokens * _HAIKU_INPUT_COST
-        + output_tokens * _HAIKU_OUTPUT_COST,
+        + input_tokens * _GPT4O_MINI_INPUT_COST
+        + output_tokens * _GPT4O_MINI_OUTPUT_COST,
         # Stash the intent for the conditional edge function
         "_router_intent": intent,
     }

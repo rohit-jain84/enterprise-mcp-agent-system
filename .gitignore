@@ -78,3 +78,6 @@ desktop.ini
 
 # ===== Logs =====
 logs/
+
+# ===== Playwright MCP =====
+.playwright-mcp/

@@ -4,8 +4,16 @@ import ChatPage from './pages/ChatPage';
 import ApprovalQueuePage from './pages/ApprovalQueuePage';
 import SessionHistoryPage from './pages/SessionHistoryPage';
 import SettingsPage from './pages/SettingsPage';
+import LoginPage from './pages/LoginPage';
+import { useAuthStore } from './stores/authStore';
 
 function App() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
   return (
     <Layout>
       <Routes>

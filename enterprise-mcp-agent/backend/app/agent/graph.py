@@ -32,30 +32,28 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 async def guardrails_input_node(state: AgentState) -> dict:
-    """Input guardrails -- validates / sanitises the incoming user message.
-
-    Placeholder that can be wired to the app.guardrails module.
-    """
-    # Import lazily to avoid circular deps; gracefully degrade if not ready.
+    """Input guardrails -- validates / sanitises the incoming user message."""
     try:
-        from app.guardrails.input import run_input_guardrails  # type: ignore[import-untyped]
+        from app.guardrails.input import run_input_guardrails
+
         result = await run_input_guardrails(state)
         if result:
             return result
-    except ImportError:
-        logger.debug("Input guardrails module not found -- skipping")
+    except Exception:
+        logger.exception("Input guardrails failed -- skipping")
     return {}
 
 
 async def guardrails_output_node(state: AgentState) -> dict:
     """Output guardrails -- validates / sanitises the outgoing response."""
     try:
-        from app.guardrails.output import run_output_guardrails  # type: ignore[import-untyped]
+        from app.guardrails.output import run_output_guardrails
+
         result = await run_output_guardrails(state)
         if result:
             return result
-    except ImportError:
-        logger.debug("Output guardrails module not found -- skipping")
+    except Exception:
+        logger.exception("Output guardrails failed -- skipping")
     return {}
 
 

@@ -1,4 +1,4 @@
-.PHONY: dev build test eval lint clean setup db-migrate mcp-test
+.PHONY: dev build test eval lint clean setup db-migrate db-revision mcp-test
 
 dev:
 	docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up --build
@@ -10,7 +10,7 @@ test:
 	cd backend && python -m pytest tests/ -v --tb=short
 
 eval:
-	cd backend && python -m evals.run_evals
+	cd backend && python -m tests.eval.eval_runner
 
 lint:
 	cd backend && ruff check . && ruff format --check .
@@ -25,6 +25,9 @@ setup:
 
 db-migrate:
 	cd backend && alembic upgrade head
+
+db-revision:
+	cd backend && alembic revision --autogenerate -m "$(msg)"
 
 mcp-test:
 	@echo "Testing GitHub MCP server..."

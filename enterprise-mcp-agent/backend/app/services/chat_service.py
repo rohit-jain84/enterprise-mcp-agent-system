@@ -6,7 +6,7 @@ import logging
 import uuid
 from typing import Any, Callable, Coroutine
 
-from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -57,10 +57,10 @@ class ChatService:
         self._session_svc = SessionService(db)
         self._cost_tracker = CostTracker()
 
-    def _build_llm(self) -> ChatAnthropic:
-        return ChatAnthropic(
-            model="claude-sonnet-4-20250514",
-            anthropic_api_key=self._settings.ANTHROPIC_API_KEY,
+    def _build_llm(self) -> ChatOpenAI:
+        return ChatOpenAI(
+            model="gpt-4o",
+            api_key=self._settings.OPENAI_API_KEY,
             max_tokens=4096,
             streaming=True,
         )

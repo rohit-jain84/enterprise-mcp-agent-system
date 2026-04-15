@@ -44,7 +44,7 @@ async def build_langchain_tools(
 ) -> list[StructuredTool]:
     """Build LangChain StructuredTool instances for every discovered MCP tool.
 
-    These tools can be bound to a ChatAnthropic model or passed directly to
+    These tools can be bound to a ChatOpenAI model or passed directly to
     LangGraph tool nodes.
     """
     tools: list[StructuredTool] = []

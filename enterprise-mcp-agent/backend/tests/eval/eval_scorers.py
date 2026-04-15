@@ -27,14 +27,14 @@ async def rubric_score(response: str, criteria: dict[str, str]) -> float:
     Returns 0.0-1.0.
     """
     try:
-        from anthropic import AsyncAnthropic
+        from openai import AsyncOpenAI
     except ImportError:
-        logger.warning("anthropic package not installed -- rubric_score returns 0.0")
+        logger.warning("openai package not installed -- rubric_score returns 0.0")
         return 0.0
 
-    api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    api_key = os.getenv("OPENAI_API_KEY", "")
     if not api_key:
-        logger.warning("ANTHROPIC_API_KEY not set -- rubric_score returns 0.0")
+        logger.warning("OPENAI_API_KEY not set -- rubric_score returns 0.0")
         return 0.0
 
     criteria_text = "\n".join(
@@ -51,14 +51,14 @@ async def rubric_score(response: str, criteria: dict[str, str]) -> float:
         "Example: {\"mentions_prs\": 1, \"mentions_tickets\": 0}"
     )
 
-    client = AsyncAnthropic(api_key=api_key)
+    client = AsyncOpenAI(api_key=api_key)
     try:
-        message = await client.messages.create(
-            model="claude-sonnet-4-20250514",
+        message = await client.chat.completions.create(
+            model="gpt-4o",
             max_tokens=512,
             messages=[{"role": "user", "content": prompt}],
         )
-        raw = message.content[0].text.strip()
+        raw = message.choices[0].message.content.strip()
         scores = json.loads(raw)
         values = [int(v) for v in scores.values()]
         return sum(values) / len(values) if values else 0.0

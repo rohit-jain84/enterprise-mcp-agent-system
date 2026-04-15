@@ -7,7 +7,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, status
 
 from app.dependencies import CurrentUser, DBSession
-from app.models.schemas import SessionCreate, SessionDetailResponse, SessionResponse
+from app.models.schemas import MessageResponse, SessionCreate, SessionDetailResponse, SessionResponse
 from app.services.session_service import SessionService
 
 router = APIRouter()
@@ -37,6 +37,16 @@ async def get_session(session_id: uuid.UUID, user: CurrentUser, db: DBSession):
     if session is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
     return session
+
+
+@router.get("/{session_id}/messages", response_model=list[MessageResponse])
+async def list_session_messages(session_id: uuid.UUID, user: CurrentUser, db: DBSession):
+    """Return all messages for a session."""
+    svc = SessionService(db)
+    session = await svc.get_session_with_messages(session_id=session_id, user_id=user.id)
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+    return session.messages
 
 
 @router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)

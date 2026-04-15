@@ -12,10 +12,13 @@ interface SessionItemProps {
 
 export default function SessionItem({ session, isActive, onClick, onDelete }: SessionItemProps) {
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
       className={clsx(
-        'w-full text-left px-3 py-2.5 rounded-lg transition-colors group',
+        'w-full text-left px-3 py-2.5 rounded-lg transition-colors group cursor-pointer',
         isActive
           ? 'bg-blue-600/20 border border-blue-500/30 text-blue-100'
           : 'hover:bg-slate-700/50 text-slate-300'
@@ -53,6 +56,6 @@ export default function SessionItem({ session, isActive, onClick, onDelete }: Se
           <Trash2 size={12} className="text-red-400" />
         </button>
       </div>
-    </button>
+    </div>
   );
 }

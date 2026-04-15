@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
-import { MessageSquare, ShieldCheck, History, Settings, Zap } from 'lucide-react';
+import { MessageSquare, ShieldCheck, History, Settings, Zap, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 import { useConnectionStore } from '@/stores/connectionStore';
 import { useApprovalStore } from '@/stores/approvalStore';
+import { useAuthStore } from '@/stores/authStore';
 import StatusBadge from './StatusBadge';
 
 interface LayoutProps {
@@ -20,6 +21,7 @@ const navItems = [
 export default function Layout({ children }: LayoutProps) {
   const { wsStatus } = useConnectionStore();
   const pendingCount = useApprovalStore((s) => s.pendingApprovals.length);
+  const logout = useAuthStore((s) => s.logout);
 
   return (
     <div className="h-screen flex flex-col bg-slate-900">
@@ -61,6 +63,13 @@ export default function Layout({ children }: LayoutProps) {
 
         <div className="flex items-center gap-3">
           <StatusBadge status={wsStatus} />
+          <button
+            onClick={logout}
+            className="flex items-center gap-1.5 text-slate-400 hover:text-slate-200 text-sm transition-colors"
+            title="Sign out"
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </header>
 

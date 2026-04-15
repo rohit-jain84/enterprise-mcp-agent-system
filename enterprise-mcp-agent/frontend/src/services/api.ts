@@ -3,7 +3,53 @@ import type { Approval } from '@/types/approvals';
 import type { Message } from '@/types/messages';
 import type { MCPServer } from '@/types/mcp';
 
-const BASE_URL = '/api';
+const BASE_URL = '/api/v1';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function mapSession(raw: any): Session {
+  return {
+    id: raw.id,
+    title: raw.title || 'New Chat',
+    createdAt: raw.created_at || raw.createdAt,
+    updatedAt: raw.updated_at || raw.updatedAt,
+    messageCount: raw.message_count ?? raw.messageCount ?? 0,
+    status: raw.status || 'active',
+    summary: raw.summary,
+    tags: raw.tags,
+  };
+}
+
+function mapApproval(raw: any): Approval {
+  return {
+    id: raw.id,
+    sessionId: raw.session_id || raw.sessionId,
+    toolCall: raw.toolCall || {
+      id: raw.id,
+      name: raw.tool_name || raw.toolName || '',
+      server: 'unknown',
+      parameters: raw.tool_args || raw.toolArgs || {},
+      status: raw.status === 'pending' ? 'pending' : 'completed',
+    },
+    reason: raw.reason || '',
+    status: raw.status,
+    createdAt: raw.created_at || raw.createdAt,
+    resolvedAt: raw.responded_at || raw.respondedAt,
+    resolvedBy: raw.responded_by || raw.respondedBy,
+  };
+}
+
+function mapMessage(raw: any): Message {
+  return {
+    id: raw.id,
+    sessionId: raw.session_id || raw.sessionId,
+    role: raw.role,
+    content: raw.content,
+    timestamp: raw.created_at || raw.createdAt || raw.timestamp,
+    toolCalls: raw.tool_calls || raw.toolCalls,
+    toolResults: raw.tool_results || raw.toolResults,
+  };
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 class TokenManager {
   private accessToken: string | null = null;
@@ -92,11 +138,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 export const apiClient = {
   // Auth
-  async login(username: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
+  async login(email: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
     const response = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     });
     const data = await handleResponse<{ access_token: string; refresh_token: string }>(response);
     tokenManager.setTokens(data.access_token, data.refresh_token);
@@ -118,12 +164,14 @@ export const apiClient = {
   // Sessions
   async getSessions(): Promise<Session[]> {
     const response = await fetchWithAuth(`${BASE_URL}/sessions`);
-    return handleResponse<Session[]>(response);
+    const raw = await handleResponse<any[]>(response);
+    return raw.map(mapSession);
   },
 
   async getSession(id: string): Promise<Session> {
     const response = await fetchWithAuth(`${BASE_URL}/sessions/${id}`);
-    return handleResponse<Session>(response);
+    const raw = await handleResponse<any>(response);
+    return mapSession(raw);
   },
 
   async createSession(data?: SessionCreate): Promise<Session> {
@@ -131,7 +179,8 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify(data || {}),
     });
-    return handleResponse<Session>(response);
+    const raw = await handleResponse<any>(response);
+    return mapSession(raw);
   },
 
   async deleteSession(id: string): Promise<void> {
@@ -143,7 +192,8 @@ export const apiClient = {
 
   async getSessionMessages(sessionId: string): Promise<Message[]> {
     const response = await fetchWithAuth(`${BASE_URL}/sessions/${sessionId}/messages`);
-    return handleResponse<Message[]>(response);
+    const raw = await handleResponse<any[]>(response);
+    return raw.map(mapMessage);
   },
 
   async sendMessage(sessionId: string, content: string): Promise<Message> {
@@ -151,13 +201,15 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify({ content }),
     });
-    return handleResponse<Message>(response);
+    const raw = await handleResponse<any>(response);
+    return mapMessage(raw);
   },
 
   // Approvals
   async getApprovals(): Promise<Approval[]> {
     const response = await fetchWithAuth(`${BASE_URL}/approvals`);
-    return handleResponse<Approval[]>(response);
+    const raw = await handleResponse<any[]>(response);
+    return raw.map(mapApproval);
   },
 
   async resolveApproval(id: string, action: 'approve' | 'reject', reason?: string): Promise<Approval> {
@@ -165,7 +217,8 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify({ action, reason }),
     });
-    return handleResponse<Approval>(response);
+    const raw = await handleResponse<any>(response);
+    return mapApproval(raw);
   },
 
   // Reports
