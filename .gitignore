@@ -1,6 +1,7 @@
-# ===== Planning & Documentation (not part of project) =====
-*.html
+# ===== Local Planning Docs =====
 Description.txt
+*.html
+!frontend/**/*.html
 
 # ===== AI Tool Config =====
 .claude/
