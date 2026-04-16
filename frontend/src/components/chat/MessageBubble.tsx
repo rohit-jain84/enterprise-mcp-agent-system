@@ -59,8 +59,8 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
             isUser
               ? 'bg-blue-600 text-white rounded-tr-sm'
               : isSystem
-              ? 'bg-amber-900/30 border border-amber-700/40 text-amber-200 rounded-tl-sm'
-              : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-sm'
+              ? 'bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-900/30 dark:border-amber-700/40 dark:text-amber-200 rounded-tl-sm'
+              : 'bg-white border border-gray-200 text-gray-800 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 rounded-tl-sm'
           )}
         >
           {isUser ? (
@@ -92,7 +92,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
         <div
           className={clsx(
-            'text-xs text-slate-500 px-1',
+            'text-xs text-gray-400 dark:text-slate-500 px-1',
             isUser ? 'text-right' : 'text-left'
           )}
         >

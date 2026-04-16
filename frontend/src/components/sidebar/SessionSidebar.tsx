@@ -59,17 +59,17 @@ export default function SessionSidebar() {
 
   if (collapsed) {
     return (
-      <div className="w-12 bg-slate-800 border-r border-slate-700 flex flex-col items-center py-3 gap-2">
+      <div className="w-12 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col items-center py-3 gap-2">
         <button
           onClick={() => setCollapsed(false)}
-          className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-slate-200"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
           title="Expand sidebar"
         >
           <PanelLeftOpen size={18} />
         </button>
         <button
           onClick={handleNewSession}
-          className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-blue-400 hover:text-blue-300"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300"
           title="New session"
         >
           <Plus size={18} />
@@ -79,13 +79,13 @@ export default function SessionSidebar() {
   }
 
   return (
-    <div className="w-72 bg-slate-800 border-r border-slate-700 flex flex-col">
-      <div className="p-3 border-b border-slate-700">
+    <div className="w-72 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col">
+      <div className="p-3 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-slate-200">Sessions</h2>
+          <h2 className="text-sm font-semibold text-gray-800 dark:text-slate-200">Sessions</h2>
           <button
             onClick={() => setCollapsed(true)}
-            className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-slate-200"
+            className="p-1.5 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
             title="Collapse sidebar"
           >
             <PanelLeftClose size={16} />
@@ -101,13 +101,13 @@ export default function SessionSidebar() {
         </button>
 
         <div className="relative mt-2">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search sessions..."
-            className="w-full bg-slate-700 border border-slate-600 rounded-lg pl-9 pr-3 py-1.5 text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-gray-50 border border-gray-300 dark:bg-slate-700 dark:border-slate-600 rounded-lg pl-9 pr-3 py-1.5 text-sm text-gray-800 dark:text-slate-200 placeholder-gray-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
@@ -118,7 +118,7 @@ export default function SessionSidebar() {
             <LoadingSpinner size="sm" />
           </div>
         ) : filteredSessions.length === 0 ? (
-          <div className="text-center py-8 text-sm text-slate-500">
+          <div className="text-center py-8 text-sm text-gray-400 dark:text-slate-500">
             {searchQuery ? 'No sessions found' : 'No sessions yet'}
           </div>
         ) : (

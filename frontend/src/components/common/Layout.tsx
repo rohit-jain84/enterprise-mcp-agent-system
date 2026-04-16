@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
-import { MessageSquare, ShieldCheck, History, Settings, Zap, LogOut } from 'lucide-react';
+import { MessageSquare, ShieldCheck, History, Settings, Zap, LogOut, Sun, Moon } from 'lucide-react';
 import clsx from 'clsx';
 import { useConnectionStore } from '@/stores/connectionStore';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useAuthStore } from '@/stores/authStore';
+import { useTheme } from '@/context/ThemeContext';
 import StatusBadge from './StatusBadge';
 
 interface LayoutProps {
@@ -22,13 +23,14 @@ export default function Layout({ children }: LayoutProps) {
   const { wsStatus } = useConnectionStore();
   const pendingCount = useApprovalStore((s) => s.pendingApprovals.length);
   const logout = useAuthStore((s) => s.logout);
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900">
-      <header className="h-14 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-4 flex-shrink-0">
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-900">
+      <header className="h-14 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-4 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Zap size={20} className="text-cyan-400" />
+            <Zap size={20} className="text-cyan-500 dark:text-cyan-400" />
             <span className="font-semibold text-sm text-gradient">
               Enterprise MCP Agent
             </span>
@@ -44,8 +46,8 @@ export default function Layout({ children }: LayoutProps) {
                   clsx(
                     'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors relative',
                     isActive
-                      ? 'bg-slate-700 text-white'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                      ? 'bg-blue-50 text-blue-700 dark:bg-slate-700 dark:text-white'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700/50'
                   )
                 }
               >
@@ -64,8 +66,15 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex items-center gap-3">
           <StatusBadge status={wsStatus} />
           <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700 transition-colors"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <button
             onClick={logout}
-            className="flex items-center gap-1.5 text-slate-400 hover:text-slate-200 text-sm transition-colors"
+            className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm transition-colors"
             title="Sign out"
           >
             <LogOut size={16} />
@@ -76,7 +85,7 @@ export default function Layout({ children }: LayoutProps) {
       <main className="flex-1 min-h-0">{children}</main>
 
       {/* Mobile nav */}
-      <nav className="md:hidden flex items-center justify-around bg-slate-800 border-t border-slate-700 py-2">
+      <nav className="md:hidden flex items-center justify-around bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 py-2">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -86,8 +95,8 @@ export default function Layout({ children }: LayoutProps) {
               clsx(
                 'flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-xs transition-colors relative',
                 isActive
-                  ? 'text-blue-400'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-400 hover:text-gray-600 dark:text-slate-500 dark:hover:text-slate-300'
               )
             }
           >

@@ -3,11 +3,11 @@ version: "3.9"
 services:
   postgres:
     ports:
-      - "5432:5432"
+      - "5435:5432"
 
   redis:
     ports:
-      - "6379:6379"
+      - "6385:6379"
 
   github-mcp:
     volumes:
@@ -31,8 +31,8 @@ services:
     volumes:
       - ../backend:/app
     ports:
-      - "8000:8000"
-      - "5678:5678"
+      - "8100:8000"
+      - "5679:5678"
     environment:
       - LOG_LEVEL=debug
       - DEBUG=true
@@ -43,7 +43,7 @@ services:
       - ../frontend:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "3100:3000"
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true

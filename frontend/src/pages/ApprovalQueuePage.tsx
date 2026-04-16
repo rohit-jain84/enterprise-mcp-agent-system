@@ -11,8 +11,8 @@ export default function ApprovalQueuePage() {
     <div className="h-full overflow-y-auto">
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-100 mb-1">Approval Queue</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-1">Approval Queue</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400">
             Review and manage tool execution approval requests across all sessions.
           </p>
         </div>
@@ -23,8 +23,8 @@ export default function ApprovalQueuePage() {
             className={clsx(
               'px-4 py-2 text-sm rounded-lg transition-colors',
               filter === 'pending'
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
+                ? 'bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/30'
+                : 'bg-white text-gray-500 border border-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700'
             )}
           >
             Pending
@@ -39,8 +39,8 @@ export default function ApprovalQueuePage() {
             className={clsx(
               'px-4 py-2 text-sm rounded-lg transition-colors',
               filter === 'all'
-                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
+                ? 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/30'
+                : 'bg-white text-gray-500 border border-gray-300 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700'
             )}
           >
             All

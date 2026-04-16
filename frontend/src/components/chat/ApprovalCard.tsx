@@ -42,12 +42,12 @@ export default function ApprovalCard({ approvalId, toolCall, reason, status }: A
       className={clsx(
         'my-2 border rounded-lg p-3',
         isPending
-          ? 'border-amber-500/40 bg-amber-500/10'
+          ? 'border-amber-300 bg-amber-50 dark:border-amber-500/40 dark:bg-amber-500/10'
           : status === 'approved'
-          ? 'border-emerald-500/30 bg-emerald-500/5'
+          ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-500/30 dark:bg-emerald-500/5'
           : status === 'rejected'
-          ? 'border-red-500/30 bg-red-500/5'
-          : 'border-slate-600 bg-slate-800/50'
+          ? 'border-red-300 bg-red-50 dark:border-red-500/30 dark:bg-red-500/5'
+          : 'border-gray-200 bg-gray-50 dark:border-slate-600 dark:bg-slate-800/50'
       )}
     >
       <div className="flex items-start gap-3">
@@ -55,24 +55,24 @@ export default function ApprovalCard({ approvalId, toolCall, reason, status }: A
           size={18}
           className={clsx(
             'flex-shrink-0 mt-0.5',
-            isPending ? 'text-amber-400' : 'text-slate-400'
+            isPending ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400 dark:text-slate-400'
           )}
         />
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-medium text-slate-200">Approval Required</span>
+            <span className="text-sm font-medium text-gray-800 dark:text-slate-200">Approval Required</span>
             {!isPending && <StatusBadge status={status} />}
           </div>
 
-          <p className="text-sm text-slate-300 mb-2">{reason}</p>
+          <p className="text-sm text-gray-600 dark:text-slate-300 mb-2">{reason}</p>
 
-          <div className="text-xs text-slate-400 mb-2">
+          <div className="text-xs text-gray-500 dark:text-slate-400 mb-2">
             <span className="font-mono">{toolCall.name}</span> on{' '}
-            <span className="text-cyan-400">{toolCall.server}</span>
+            <span className="text-cyan-600 dark:text-cyan-400">{toolCall.server}</span>
           </div>
 
-          <pre className="text-xs bg-slate-900/50 rounded p-2 overflow-x-auto text-slate-400 mb-3">
+          <pre className="text-xs bg-gray-100 dark:bg-slate-900/50 rounded p-2 overflow-x-auto text-gray-500 dark:text-slate-400 mb-3">
             {JSON.stringify(toolCall.parameters, null, 2)}
           </pre>
 

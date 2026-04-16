@@ -39,8 +39,8 @@ export default function ApprovalItem({ approval }: ApprovalItemProps) {
       className={clsx(
         'border rounded-xl p-4 transition-colors',
         isPending
-          ? 'border-amber-500/40 bg-amber-500/5'
-          : 'border-slate-700 bg-slate-800/50'
+          ? 'border-amber-300 bg-amber-50 dark:border-amber-500/40 dark:bg-amber-500/5'
+          : 'border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-800/50'
       )}
     >
       <div className="flex items-start gap-3">
@@ -48,24 +48,24 @@ export default function ApprovalItem({ approval }: ApprovalItemProps) {
           size={20}
           className={clsx(
             'flex-shrink-0 mt-0.5',
-            isPending ? 'text-amber-400' : 'text-slate-500'
+            isPending ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400 dark:text-slate-500'
           )}
         />
 
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-medium text-sm text-slate-200">
+            <span className="font-medium text-sm text-gray-800 dark:text-slate-200">
               {approval.toolCall.name}
             </span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
               {approval.toolCall.server}
             </span>
             <StatusBadge status={approval.status} />
           </div>
 
-          <p className="text-sm text-slate-300 mb-2">{approval.reason}</p>
+          <p className="text-sm text-gray-600 dark:text-slate-300 mb-2">{approval.reason}</p>
 
-          <div className="flex items-center gap-3 text-xs text-slate-500 mb-2">
+          <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-slate-500 mb-2">
             <span className="flex items-center gap-1">
               <Clock size={12} />
               {format(new Date(approval.createdAt), 'MMM d, HH:mm')}
@@ -75,14 +75,14 @@ export default function ApprovalItem({ approval }: ApprovalItemProps) {
 
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-300 transition-colors mb-2"
+            className="flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition-colors mb-2"
           >
             {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             Parameters
           </button>
 
           {expanded && (
-            <pre className="text-xs bg-slate-900 rounded-lg p-3 overflow-x-auto text-slate-400 mb-3">
+            <pre className="text-xs bg-gray-100 dark:bg-slate-900 rounded-lg p-3 overflow-x-auto text-gray-500 dark:text-slate-400 mb-3">
               {JSON.stringify(approval.toolCall.parameters, null, 2)}
             </pre>
           )}
