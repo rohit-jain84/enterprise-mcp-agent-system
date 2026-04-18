@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
 from app.api.websocket import manager
 from app.dependencies import CurrentUser, DBSession, SettingsDep
@@ -61,19 +61,25 @@ async def websocket_chat(websocket: WebSocket, session_id: uuid.UUID):
             try:
                 msg = WSMessage(**raw)
             except Exception as exc:
-                await manager.send_json(websocket, {
-                    "type": "error",
-                    "payload": {"detail": f"Invalid message format: {exc}"},
-                })
+                await manager.send_json(
+                    websocket,
+                    {
+                        "type": "error",
+                        "payload": {"detail": f"Invalid message format: {exc}"},
+                    },
+                )
                 continue
 
             if msg.type == "user_message":
                 user_text = msg.payload.get("message", "")
                 if not user_text:
-                    await manager.send_json(websocket, {
-                        "type": "error",
-                        "payload": {"detail": "Empty message"},
-                    })
+                    await manager.send_json(
+                        websocket,
+                        {
+                            "type": "error",
+                            "payload": {"detail": "Empty message"},
+                        },
+                    )
                     continue
 
                 # Stream start
@@ -81,8 +87,8 @@ async def websocket_chat(websocket: WebSocket, session_id: uuid.UUID):
 
                 try:
                     # Import here to avoid circular imports at module level
-                    from app.db.engine import get_session_factory
                     from app.config import get_settings
+                    from app.db.engine import get_session_factory
 
                     settings = get_settings()
                     factory = get_session_factory()
@@ -92,49 +98,64 @@ async def websocket_chat(websocket: WebSocket, session_id: uuid.UUID):
                     session_data = await tracker.get_session_totals(session_id)
                     session_spend = session_data["total_cost"]
                     if session_spend >= settings.COST_BUDGET_PER_SESSION:
-                        await manager.send_json(websocket, {
-                            "type": "error",
-                            "payload": {
-                                "detail": (
-                                    f"Session cost budget exceeded: "
-                                    f"${session_spend:.4f} spent of "
-                                    f"${settings.COST_BUDGET_PER_SESSION:.2f} limit"
-                                ),
-                                "code": 429,
+                        await manager.send_json(
+                            websocket,
+                            {
+                                "type": "error",
+                                "payload": {
+                                    "detail": (
+                                        f"Session cost budget exceeded: "
+                                        f"${session_spend:.4f} spent of "
+                                        f"${settings.COST_BUDGET_PER_SESSION:.2f} limit"
+                                    ),
+                                    "code": 429,
+                                },
                             },
-                        })
+                        )
                         continue
 
                     async with factory() as db:
                         svc = ChatService(db=db, settings=settings, user=None)
 
                         async def on_chunk(chunk: str) -> None:
-                            await manager.send_json(websocket, {
-                                "type": "stream_chunk",
-                                "payload": {"content": chunk},
-                            })
+                            await manager.send_json(
+                                websocket,
+                                {
+                                    "type": "stream_chunk",
+                                    "payload": {"content": chunk},
+                                },
+                            )
 
                         async def on_tool_call(tool_name: str, tool_args: dict) -> None:
-                            await manager.send_json(websocket, {
-                                "type": "tool_call",
-                                "payload": {"tool_name": tool_name, "tool_args": tool_args},
-                            })
+                            await manager.send_json(
+                                websocket,
+                                {
+                                    "type": "tool_call",
+                                    "payload": {"tool_name": tool_name, "tool_args": tool_args},
+                                },
+                            )
 
                         async def on_tool_result(tool_name: str, result: str) -> None:
-                            await manager.send_json(websocket, {
-                                "type": "tool_result",
-                                "payload": {"tool_name": tool_name, "result": result},
-                            })
+                            await manager.send_json(
+                                websocket,
+                                {
+                                    "type": "tool_result",
+                                    "payload": {"tool_name": tool_name, "result": result},
+                                },
+                            )
 
                         async def on_approval_request(approval_id: str, tool_name: str, tool_args: dict) -> None:
-                            await manager.send_json(websocket, {
-                                "type": "approval_request",
-                                "payload": {
-                                    "approval_id": approval_id,
-                                    "tool_name": tool_name,
-                                    "tool_args": tool_args,
+                            await manager.send_json(
+                                websocket,
+                                {
+                                    "type": "approval_request",
+                                    "payload": {
+                                        "approval_id": approval_id,
+                                        "tool_name": tool_name,
+                                        "tool_args": tool_args,
+                                    },
                                 },
-                            })
+                            )
 
                         result = await svc.invoke_streaming(
                             session_id=session_id,
@@ -148,30 +169,39 @@ async def websocket_chat(websocket: WebSocket, session_id: uuid.UUID):
                         await db.commit()
 
                     # Stream end
-                    await manager.send_json(websocket, {
-                        "type": "stream_end",
-                        "payload": {
-                            "message_id": str(result.get("message_id", "")),
-                            "token_count": result.get("token_count", 0),
-                            "cost": result.get("cost", 0.0),
+                    await manager.send_json(
+                        websocket,
+                        {
+                            "type": "stream_end",
+                            "payload": {
+                                "message_id": str(result.get("message_id", "")),
+                                "token_count": result.get("token_count", 0),
+                                "cost": result.get("cost", 0.0),
+                            },
                         },
-                    })
+                    )
 
                 except Exception as exc:
                     logger.exception("Error processing chat message via WebSocket")
-                    await manager.send_json(websocket, {
-                        "type": "error",
-                        "payload": {"detail": str(exc)},
-                    })
+                    await manager.send_json(
+                        websocket,
+                        {
+                            "type": "error",
+                            "payload": {"detail": str(exc)},
+                        },
+                    )
 
             elif msg.type == "approval_response":
                 approval_id = msg.payload.get("approval_id")
                 action = msg.payload.get("action")
                 if not approval_id or not action:
-                    await manager.send_json(websocket, {
-                        "type": "error",
-                        "payload": {"detail": "Missing approval_id or action"},
-                    })
+                    await manager.send_json(
+                        websocket,
+                        {
+                            "type": "error",
+                            "payload": {"detail": "Missing approval_id or action"},
+                        },
+                    )
                     continue
 
                 try:
@@ -188,23 +218,36 @@ async def websocket_chat(websocket: WebSocket, session_id: uuid.UUID):
                         )
                         await db.commit()
 
-                    await manager.send_json(websocket, {
-                        "type": "tool_result",
-                        "payload": {"approval_id": approval_id, "action": action, "status": "processed"},
-                    })
+                    await manager.send_json(
+                        websocket,
+                        {
+                            "type": "tool_result",
+                            "payload": {
+                                "approval_id": approval_id,
+                                "action": action,
+                                "status": "processed",
+                            },
+                        },
+                    )
 
                 except Exception as exc:
                     logger.exception("Error processing approval response via WebSocket")
-                    await manager.send_json(websocket, {
-                        "type": "error",
-                        "payload": {"detail": str(exc)},
-                    })
+                    await manager.send_json(
+                        websocket,
+                        {
+                            "type": "error",
+                            "payload": {"detail": str(exc)},
+                        },
+                    )
 
             else:
-                await manager.send_json(websocket, {
-                    "type": "error",
-                    "payload": {"detail": f"Unknown message type: {msg.type}"},
-                })
+                await manager.send_json(
+                    websocket,
+                    {
+                        "type": "error",
+                        "payload": {"detail": f"Unknown message type: {msg.type}"},
+                    },
+                )
 
     except WebSocketDisconnect:
         manager.disconnect(websocket, session_id)

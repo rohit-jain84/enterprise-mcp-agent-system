@@ -7,7 +7,12 @@ import uuid
 from fastapi import APIRouter, HTTPException, status
 
 from app.dependencies import CurrentUser, DBSession
-from app.models.schemas import MessageResponse, SessionCreate, SessionDetailResponse, SessionResponse
+from app.models.schemas import (
+    MessageResponse,
+    SessionCreate,
+    SessionDetailResponse,
+    SessionResponse,
+)
 from app.services.session_service import SessionService
 
 router = APIRouter()

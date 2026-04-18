@@ -10,21 +10,17 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 # NeMo Guardrails is an optional dependency; the module degrades gracefully.
 try:
-    from nemoguardrails import RailsConfig, LLMRails
+    from nemoguardrails import LLMRails, RailsConfig
 
     NEMO_AVAILABLE = True
 except ImportError:
     NEMO_AVAILABLE = False
-    logger.warning(
-        "nemoguardrails package not installed. "
-        "Guardrails will operate in pass-through mode."
-    )
+    logger.warning("nemoguardrails package not installed. Guardrails will operate in pass-through mode.")
 
 _DEFAULT_CONFIG_DIR = Path(__file__).resolve().parent / "config"
 
@@ -40,9 +36,9 @@ class GuardrailsWrapper:
         directory shipped alongside this module.
     """
 
-    def __init__(self, config_dir: Optional[str | Path] = None) -> None:
+    def __init__(self, config_dir: str | Path | None = None) -> None:
         self._config_dir = Path(config_dir) if config_dir else _DEFAULT_CONFIG_DIR
-        self._rails: Optional["LLMRails"] = None
+        self._rails: LLMRails | None = None
         self._enabled: bool = False
 
     # ------------------------------------------------------------------
@@ -72,13 +68,9 @@ class GuardrailsWrapper:
             config = RailsConfig.from_path(str(self._config_dir))
             self._rails = LLMRails(config)
             self._enabled = True
-            logger.info(
-                "NeMo Guardrails initialised from %s.", self._config_dir
-            )
+            logger.info("NeMo Guardrails initialised from %s.", self._config_dir)
         except Exception:
-            logger.exception(
-                "Failed to initialise NeMo Guardrails; pass-through mode enabled."
-            )
+            logger.exception("Failed to initialise NeMo Guardrails; pass-through mode enabled.")
             self._rails = None
             self._enabled = False
 
@@ -91,7 +83,7 @@ class GuardrailsWrapper:
     # Input checking
     # ------------------------------------------------------------------
 
-    async def check_input(self, message: str) -> tuple[bool, Optional[str]]:
+    async def check_input(self, message: str) -> tuple[bool, str | None]:
         """Validate a user message against the configured input rails.
 
         Parameters
@@ -109,9 +101,7 @@ class GuardrailsWrapper:
             return True, None
 
         try:
-            response = await self._rails.generate_async(
-                messages=[{"role": "user", "content": message}]
-            )
+            response = await self._rails.generate_async(messages=[{"role": "user", "content": message}])
 
             # NeMo Guardrails returns a bot response. If a rail triggered, the
             # response typically starts with "I'm sorry" or similar refusal
@@ -151,9 +141,7 @@ class GuardrailsWrapper:
             for marker in _REFUSAL_MARKERS:
                 if lower_msg.startswith(marker):
                     reason = bot_message.strip()
-                    logger.info(
-                        "Input blocked by guardrails: %s", reason[:200]
-                    )
+                    logger.info("Input blocked by guardrails: %s", reason[:200])
                     return False, reason
 
             return True, None
@@ -209,7 +197,5 @@ class GuardrailsWrapper:
             return filtered
 
         except Exception:
-            logger.exception(
-                "Error during output guardrail check; returning original response."
-            )
+            logger.exception("Error during output guardrail check; returning original response.")
             return response

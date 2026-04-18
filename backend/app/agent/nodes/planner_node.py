@@ -6,8 +6,8 @@ import json
 import logging
 from typing import Any
 
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 
 from app.agent.prompts import PLANNER_FEW_SHOT, PLANNER_SYSTEM_PROMPT
 from app.agent.state import AgentState
@@ -36,7 +36,9 @@ async def planner_node(state: AgentState) -> dict[str, Any]:
     # Build few-shot messages
     few_shot_msgs: list = []
     for entry in PLANNER_FEW_SHOT:
-        from langchain_core.messages import HumanMessage as HM, AIMessage as AM
+        from langchain_core.messages import AIMessage as AM
+        from langchain_core.messages import HumanMessage as HM
+
         if entry["role"] == "user":
             few_shot_msgs.append(HM(content=entry["content"]))
         else:

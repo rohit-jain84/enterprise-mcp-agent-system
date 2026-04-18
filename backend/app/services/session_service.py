@@ -18,9 +18,7 @@ class SessionService:
     async def list_sessions(self, user_id: uuid.UUID) -> list[Session]:
         """Return all sessions for a user, ordered by most recently updated."""
         result = await self._db.execute(
-            select(Session)
-            .where(Session.user_id == user_id)
-            .order_by(Session.updated_at.desc())
+            select(Session).where(Session.user_id == user_id).order_by(Session.updated_at.desc())
         )
         return list(result.scalars().all())
 
@@ -34,14 +32,10 @@ class SessionService:
 
     async def get_session(self, session_id: uuid.UUID, user_id: uuid.UUID) -> Session | None:
         """Return a session if it belongs to the user."""
-        result = await self._db.execute(
-            select(Session).where(Session.id == session_id, Session.user_id == user_id)
-        )
+        result = await self._db.execute(select(Session).where(Session.id == session_id, Session.user_id == user_id))
         return result.scalar_one_or_none()
 
-    async def get_session_with_messages(
-        self, session_id: uuid.UUID, user_id: uuid.UUID
-    ) -> Session | None:
+    async def get_session_with_messages(self, session_id: uuid.UUID, user_id: uuid.UUID) -> Session | None:
         """Return a session eagerly loaded with its messages."""
         result = await self._db.execute(
             select(Session)
@@ -52,18 +46,12 @@ class SessionService:
 
     async def delete_session(self, session_id: uuid.UUID, user_id: uuid.UUID) -> bool:
         """Delete a session; return True if it existed."""
-        result = await self._db.execute(
-            delete(Session).where(Session.id == session_id, Session.user_id == user_id)
-        )
+        result = await self._db.execute(delete(Session).where(Session.id == session_id, Session.user_id == user_id))
         return result.rowcount > 0
 
-    async def update_session_costs(
-        self, session_id: uuid.UUID, tokens: int, cost: float
-    ) -> None:
+    async def update_session_costs(self, session_id: uuid.UUID, tokens: int, cost: float) -> None:
         """Increment token and cost counters on a session."""
-        result = await self._db.execute(
-            select(Session).where(Session.id == session_id)
-        )
+        result = await self._db.execute(select(Session).where(Session.id == session_id))
         session = result.scalar_one_or_none()
         if session:
             session.total_tokens += tokens

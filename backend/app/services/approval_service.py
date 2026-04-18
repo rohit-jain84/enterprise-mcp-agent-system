@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,30 +37,33 @@ class ApprovalService:
             tool_args=tool_args,
             reason=reason,
             status=ApprovalStatus.PENDING,
-            expires_at=datetime.now(timezone.utc) + timedelta(minutes=expiry_minutes),
+            expires_at=datetime.now(UTC) + timedelta(minutes=expiry_minutes),
         )
         self._db.add(approval)
         await self._db.flush()
         await self._db.refresh(approval)
 
         # Notify connected WebSocket clients
-        await manager.broadcast_to_session(session_id, {
-            "type": "approval_request",
-            "payload": {
-                "approval_id": str(approval.id),
-                "tool_name": tool_name,
-                "tool_args": tool_args,
-                "reason": reason,
-                "expires_at": approval.expires_at.isoformat(),
+        await manager.broadcast_to_session(
+            session_id,
+            {
+                "type": "approval_request",
+                "payload": {
+                    "approval_id": str(approval.id),
+                    "tool_name": tool_name,
+                    "tool_args": tool_args,
+                    "reason": reason,
+                    "expires_at": approval.expires_at.isoformat(),
+                },
             },
-        })
+        )
 
         logger.info("Approval %s created for tool %s in session %s", approval.id, tool_name, session_id)
         return approval
 
     async def list_pending(self, user_id: uuid.UUID) -> list[Approval]:
         """Return all pending, non-expired approvals for sessions owned by the user."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         result = await self._db.execute(
             select(Approval)
             .join(Session, Approval.session_id == Session.id)
@@ -74,9 +77,7 @@ class ApprovalService:
         return list(result.scalars().all())
 
     async def get_approval(self, approval_id: uuid.UUID) -> Approval | None:
-        result = await self._db.execute(
-            select(Approval).where(Approval.id == approval_id)
-        )
+        result = await self._db.execute(select(Approval).where(Approval.id == approval_id))
         return result.scalar_one_or_none()
 
     async def process_response(
@@ -97,7 +98,7 @@ class ApprovalService:
             return None
 
         # Check expiry
-        if approval.expires_at < datetime.now(timezone.utc):
+        if approval.expires_at < datetime.now(UTC):
             approval.status = ApprovalStatus.EXPIRED
             await self._db.flush()
             logger.warning("Approval %s has expired", approval_id)
@@ -105,28 +106,31 @@ class ApprovalService:
 
         approval.status = action  # "approved" or "rejected"
         approval.responded_by = responded_by
-        approval.responded_at = datetime.now(timezone.utc)
+        approval.responded_at = datetime.now(UTC)
         if reason:
             approval.reason = reason
         await self._db.flush()
         await self._db.refresh(approval)
 
         # Notify via WebSocket
-        await manager.broadcast_to_session(approval.session_id, {
-            "type": "tool_result",
-            "payload": {
-                "approval_id": str(approval.id),
-                "status": approval.status,
-                "tool_name": approval.tool_name,
+        await manager.broadcast_to_session(
+            approval.session_id,
+            {
+                "type": "tool_result",
+                "payload": {
+                    "approval_id": str(approval.id),
+                    "status": approval.status,
+                    "tool_name": approval.tool_name,
+                },
             },
-        })
+        )
 
         logger.info("Approval %s resolved as %s", approval_id, action)
         return approval
 
     async def expire_stale_approvals(self) -> int:
         """Mark all expired approvals. Returns count of newly expired."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         result = await self._db.execute(
             select(Approval).where(
                 Approval.status == ApprovalStatus.PENDING,

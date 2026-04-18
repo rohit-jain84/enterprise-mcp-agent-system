@@ -86,19 +86,36 @@ class MCPClientManager:
     # as the SSE endpoint responds.
     _TOOL_MANIFEST: dict[str, list[str]] = {
         "github": [
-            "get_ci_status", "list_commits", "list_issues", "get_issue_details",
-            "list_pull_requests", "get_pr_details", "get_pr_diff",
-            "create_issue", "add_comment", "add_labels",
+            "get_ci_status",
+            "list_commits",
+            "list_issues",
+            "get_issue_details",
+            "list_pull_requests",
+            "get_pr_details",
+            "get_pr_diff",
+            "create_issue",
+            "add_comment",
+            "add_labels",
         ],
         "project_mgmt": [
-            "get_backlog", "get_assignments", "list_sprints", "get_sprint_details",
-            "list_tickets", "get_ticket_details", "get_velocity",
-            "update_ticket_priority", "update_ticket_assignee",
-            "update_ticket_labels", "move_ticket",
+            "get_backlog",
+            "get_assignments",
+            "list_sprints",
+            "get_sprint_details",
+            "list_tickets",
+            "get_ticket_details",
+            "get_velocity",
+            "update_ticket_priority",
+            "update_ticket_assignee",
+            "update_ticket_labels",
+            "move_ticket",
         ],
         "calendar": [
-            "check_availability", "list_meetings", "get_meeting_details",
-            "get_attendees", "get_meeting_notes",
+            "check_availability",
+            "list_meetings",
+            "get_meeting_details",
+            "get_attendees",
+            "get_meeting_notes",
         ],
     }
 
@@ -107,7 +124,9 @@ class MCPClientManager:
         assert self._http is not None
         try:
             async with self._http.stream(
-                "GET", f"{server.base_url}/sse", timeout=5.0,
+                "GET",
+                f"{server.base_url}/sse",
+                timeout=5.0,
             ) as resp:
                 healthy = resp.status_code == 200
         except Exception:
@@ -122,7 +141,8 @@ class MCPClientManager:
                 self._tool_to_server[n] = server.name
             logger.info(
                 "MCP server %s reachable; %d tools registered",
-                server.name, len(tool_names),
+                server.name,
+                len(tool_names),
             )
 
     # ------------------------------------------------------------------
@@ -179,8 +199,7 @@ class MCPClientManager:
         server_name = self._tool_to_server.get(tool_name)
         if server_name is None:
             raise ValueError(
-                f"Tool '{tool_name}' not found on any server. "
-                f"Available tools: {list(self._tool_to_server.keys())}"
+                f"Tool '{tool_name}' not found on any server. Available tools: {list(self._tool_to_server.keys())}"
             )
         return await self.call_tool(server_name, tool_name, args)
 
@@ -214,7 +233,9 @@ class MCPClientManager:
             try:
                 assert self._http is not None
                 async with self._http.stream(
-                    "GET", f"{server.base_url}/sse", timeout=5.0,
+                    "GET",
+                    f"{server.base_url}/sse",
+                    timeout=5.0,
                 ) as resp:
                     healthy = resp.status_code == 200
             except Exception:

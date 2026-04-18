@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from langchain_core.messages import AIMessage
@@ -47,7 +47,7 @@ async def approval_gate_node(state: AgentState) -> dict[str, Any]:
     if requested_at:
         try:
             req_time = datetime.fromisoformat(requested_at)
-            elapsed = (datetime.now(timezone.utc) - req_time).total_seconds()
+            elapsed = (datetime.now(UTC) - req_time).total_seconds()
             if elapsed > APPROVAL_TIMEOUT_SECONDS:
                 logger.warning(
                     "Approval timed out for tool=%s approval_id=%s elapsed=%.0fs",
@@ -90,7 +90,7 @@ async def approval_gate_node(state: AgentState) -> dict[str, Any]:
     if requested_at:
         try:
             req_time = datetime.fromisoformat(requested_at)
-            elapsed = (datetime.now(timezone.utc) - req_time).total_seconds()
+            elapsed = (datetime.now(UTC) - req_time).total_seconds()
             if elapsed > APPROVAL_TIMEOUT_SECONDS:
                 logger.warning("Approval response arrived after timeout for %s", approval_id)
                 msg = AIMessage(

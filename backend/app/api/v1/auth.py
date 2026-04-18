@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from jose import jwt
 from passlib.context import CryptContext
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
 from app.dependencies import DBSession, SettingsDep
@@ -31,8 +30,8 @@ def hash_password(plain: str) -> str:
 
 def _create_token(data: dict, secret: str, algorithm: str, expires_delta: timedelta) -> str:
     to_encode = data.copy()
-    to_encode["exp"] = datetime.now(timezone.utc) + expires_delta
-    to_encode["iat"] = datetime.now(timezone.utc)
+    to_encode["exp"] = datetime.now(UTC) + expires_delta
+    to_encode["iat"] = datetime.now(UTC)
     return jwt.encode(to_encode, secret, algorithm=algorithm)
 
 

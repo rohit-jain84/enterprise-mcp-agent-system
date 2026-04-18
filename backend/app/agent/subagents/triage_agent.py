@@ -6,8 +6,8 @@ import json
 import logging
 from typing import Any
 
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 
 from app.agent.prompts import TRIAGE_AGENT_SYSTEM_PROMPT
 from app.agent.state import AgentState
@@ -43,17 +43,20 @@ Respond with ONLY the JSON object, no explanation."""
 
 
 async def _extract_ticket_filters(
-    llm: ChatOpenAI, query: str,
+    llm: ChatOpenAI,
+    query: str,
 ) -> dict[str, str]:
     """Use the LLM to parse the user's query into ticket filters."""
     if not query.strip():
         return {"status": "open"}
 
     try:
-        response = await llm.ainvoke([
-            SystemMessage(content=_FILTER_EXTRACTION_PROMPT),
-            HumanMessage(content=query),
-        ])
+        response = await llm.ainvoke(
+            [
+                SystemMessage(content=_FILTER_EXTRACTION_PROMPT),
+                HumanMessage(content=query),
+            ]
+        )
         filters = json.loads(response.content.strip())
         if isinstance(filters, dict) and filters:
             logger.info("Extracted ticket filters from query: %s", filters)
@@ -104,10 +107,12 @@ async def triage_agent_node(state: AgentState) -> dict[str, Any]:
     except Exception as exc:
         logger.exception("Failed to fetch tickets for triage")
         return {
-            "messages": [AIMessage(
-                content=f"[Triage] Failed to fetch tickets: {exc}",
-                name="triage_agent",
-            )],
+            "messages": [
+                AIMessage(
+                    content=f"[Triage] Failed to fetch tickets: {exc}",
+                    name="triage_agent",
+                )
+            ],
             "sub_agent_result": f"Error fetching tickets: {exc}",
             "delegate_to": None,
         }
@@ -115,10 +120,12 @@ async def triage_agent_node(state: AgentState) -> dict[str, Any]:
     filter_desc = ", ".join(f"{k}={v}" for k, v in ticket_filters.items())
     if not tickets:
         return {
-            "messages": [AIMessage(
-                content=f"[Triage] No tickets found matching filters: {filter_desc}.",
-                name="triage_agent",
-            )],
+            "messages": [
+                AIMessage(
+                    content=f"[Triage] No tickets found matching filters: {filter_desc}.",
+                    name="triage_agent",
+                )
+            ],
             "sub_agent_result": f"No tickets found matching filters: {filter_desc}.",
             "delegate_to": None,
         }
@@ -129,12 +136,14 @@ async def triage_agent_node(state: AgentState) -> dict[str, Any]:
     tickets_block = json.dumps(tickets, indent=2, default=str)
     triage_prompt = [
         SystemMessage(content=TRIAGE_AGENT_SYSTEM_PROMPT),
-        HumanMessage(content=(
-            f"User request: {query}\n\n"
-            f"Tickets to triage ({len(tickets)} total):\n"
-            f"```json\n{tickets_block}\n```\n\n"
-            f"Please analyse and produce a triage report."
-        )),
+        HumanMessage(
+            content=(
+                f"User request: {query}\n\n"
+                f"Tickets to triage ({len(tickets)} total):\n"
+                f"```json\n{tickets_block}\n```\n\n"
+                f"Please analyse and produce a triage report."
+            )
+        ),
     ]
 
     response = await llm.ainvoke(triage_prompt)
@@ -147,10 +156,12 @@ async def triage_agent_node(state: AgentState) -> dict[str, Any]:
     logger.info("Triage agent produced %d-char report for %d tickets", len(report), len(tickets))
 
     return {
-        "messages": [AIMessage(
-            content=f"[Triage] Analysed {len(tickets)} tickets.",
-            name="triage_agent",
-        )],
+        "messages": [
+            AIMessage(
+                content=f"[Triage] Analysed {len(tickets)} tickets.",
+                name="triage_agent",
+            )
+        ],
         "sub_agent_result": report,
         "delegate_to": None,
         "total_tokens_input": state.get("total_tokens_input", 0) + input_tokens,

@@ -21,7 +21,11 @@ class ConnectionManager:
         """Accept the WebSocket and register it under the given session."""
         await websocket.accept()
         self._connections[session_id].append(websocket)
-        logger.info("WebSocket connected for session %s (total=%d)", session_id, len(self._connections[session_id]))
+        logger.info(
+            "WebSocket connected for session %s (total=%d)",
+            session_id,
+            len(self._connections[session_id]),
+        )
 
     def disconnect(self, websocket: WebSocket, session_id: uuid.UUID) -> None:
         """Remove a WebSocket from the session's connection list."""

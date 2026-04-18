@@ -5,12 +5,12 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import ApprovalStatus, MessageRole
-
+from app.models.enums import ApprovalStatus
 
 # ---------- Auth ----------
+
 
 class LoginRequest(BaseModel):
     email: str = Field(..., description="User email address")
@@ -30,6 +30,7 @@ class RefreshRequest(BaseModel):
 
 # ---------- Users ----------
 
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -42,6 +43,7 @@ class UserResponse(BaseModel):
 
 
 # ---------- Sessions ----------
+
 
 class SessionCreate(BaseModel):
     title: str = Field(default="New Chat", max_length=255)
@@ -66,6 +68,7 @@ class SessionDetailResponse(SessionResponse):
 
 # ---------- Messages ----------
 
+
 class MessageResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -81,6 +84,7 @@ class MessageResponse(BaseModel):
 
 
 # ---------- Chat ----------
+
 
 class ChatRequest(BaseModel):
     session_id: uuid.UUID
@@ -98,6 +102,7 @@ class ChatResponse(BaseModel):
 
 # ---------- Approvals ----------
 
+
 class ApprovalResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -114,13 +119,12 @@ class ApprovalResponse(BaseModel):
 
 
 class ApprovalActionRequest(BaseModel):
-    action: ApprovalStatus = Field(
-        ..., description="Must be 'approved' or 'rejected'"
-    )
+    action: ApprovalStatus = Field(..., description="Must be 'approved' or 'rejected'")
     reason: str = Field(default="", max_length=1000)
 
 
 # ---------- Reports ----------
+
 
 class ReportRequest(BaseModel):
     session_id: uuid.UUID
@@ -136,6 +140,7 @@ class ReportResponse(BaseModel):
 
 # ---------- Health ----------
 
+
 class HealthResponse(BaseModel):
     status: str
     database: str
@@ -146,19 +151,23 @@ class HealthResponse(BaseModel):
 
 # ---------- WebSocket Messages ----------
 
+
 class WSMessage(BaseModel):
     """Envelope for WebSocket messages from the client."""
+
     type: str  # user_message | approval_response
     payload: dict = {}
 
 
 class WSOutbound(BaseModel):
     """Envelope for WebSocket messages to the client."""
+
     type: str  # stream_start | stream_chunk | stream_end | tool_call | tool_result | approval_request | error
     payload: dict = {}
 
 
 # ---------- Error ----------
+
 
 class ErrorResponse(BaseModel):
     detail: str

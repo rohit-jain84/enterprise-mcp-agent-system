@@ -6,7 +6,6 @@ import logging
 from typing import Literal
 
 from app.agent.state import AgentState
-from app.mcp.registry import is_write_tool
 
 logger = logging.getLogger(__name__)
 

@@ -6,8 +6,8 @@ import json
 import logging
 from typing import Any
 
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 
 from app.agent.prompts import ROUTER_FEW_SHOT, ROUTER_SYSTEM_PROMPT
 from app.agent.state import AgentState
@@ -16,8 +16,8 @@ from app.config import get_settings
 logger = logging.getLogger(__name__)
 
 # Cost per token for GPT-4o-mini (rough estimates for tracking).
-_GPT4O_MINI_INPUT_COST = 0.15 / 1_000_000   # $0.15 per 1M input tokens
-_GPT4O_MINI_OUTPUT_COST = 0.60 / 1_000_000   # $0.60 per 1M output tokens
+_GPT4O_MINI_INPUT_COST = 0.15 / 1_000_000  # $0.15 per 1M input tokens
+_GPT4O_MINI_OUTPUT_COST = 0.60 / 1_000_000  # $0.60 per 1M output tokens
 
 
 def _build_few_shot_messages() -> list[HumanMessage | AIMessage]:

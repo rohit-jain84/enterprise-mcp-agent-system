@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Literal
 
 from langgraph.graph import END, START, StateGraph
 
@@ -30,6 +29,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Guardrail stubs (thin wrappers -- real logic lives in app.guardrails)
 # ---------------------------------------------------------------------------
+
 
 async def guardrails_input_node(state: AgentState) -> dict:
     """Input guardrails -- validates / sanitises the incoming user message."""
@@ -61,6 +61,7 @@ async def guardrails_output_node(state: AgentState) -> dict:
 # Delegate dispatcher
 # ---------------------------------------------------------------------------
 
+
 async def delegate_node(state: AgentState) -> dict:
     """Dispatch to the appropriate sub-agent based on ``delegate_to``."""
     target = state.get("delegate_to")
@@ -76,6 +77,7 @@ async def delegate_node(state: AgentState) -> dict:
 # ---------------------------------------------------------------------------
 # Graph construction
 # ---------------------------------------------------------------------------
+
 
 def build_graph() -> StateGraph:
     """Construct the full LangGraph StateGraph (uncompiled).

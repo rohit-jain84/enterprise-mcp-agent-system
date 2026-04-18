@@ -9,9 +9,9 @@ import json
 import logging
 import time
 import uuid
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
-from typing import AsyncGenerator
+from datetime import UTC, datetime
 
 import redis.asyncio as aioredis
 
@@ -46,11 +46,13 @@ class MetricsCollector:
         """Record a latency measurement."""
         now = time.time()
         key = f"{METRICS_PREFIX}:latency:{operation}"
-        entry = json.dumps({
-            "latency_ms": round(latency_ms, 2),
-            "labels": labels or {},
-            "ts": datetime.now(timezone.utc).isoformat(),
-        })
+        entry = json.dumps(
+            {
+                "latency_ms": round(latency_ms, 2),
+                "labels": labels or {},
+                "ts": datetime.now(UTC).isoformat(),
+            }
+        )
         pipe = self.redis.pipeline()
         pipe.zadd(key, {entry: now})
         pipe.expire(key, RETENTION_SECONDS)
@@ -69,13 +71,15 @@ class MetricsCollector:
         """Record a cost event."""
         now = time.time()
         key = f"{METRICS_PREFIX}:cost:{user_id}"
-        entry = json.dumps({
-            "session_id": str(session_id),
-            "cost": cost,
-            "tokens": tokens,
-            "model": model,
-            "ts": datetime.now(timezone.utc).isoformat(),
-        })
+        entry = json.dumps(
+            {
+                "session_id": str(session_id),
+                "cost": cost,
+                "tokens": tokens,
+                "model": model,
+                "ts": datetime.now(UTC).isoformat(),
+            }
+        )
         pipe = self.redis.pipeline()
         pipe.zadd(key, {entry: now})
         pipe.expire(key, RETENTION_SECONDS)

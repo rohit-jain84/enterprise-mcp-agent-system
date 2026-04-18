@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Annotated, AsyncGenerator
+from collections.abc import AsyncGenerator
+from typing import Annotated
 
 from fastapi import Depends, Header, HTTPException, status
 from jose import JWTError, jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import Settings, get_settings as _get_settings
+from app.config import Settings
+from app.config import get_settings as _get_settings
 from app.db.engine import get_async_session
 from app.models.database import User
 
@@ -19,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 # ---------- Settings ----------
+
 
 def get_settings() -> Settings:
     return _get_settings()
@@ -28,6 +31,7 @@ SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 
 # ---------- Database Session ----------
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Yield an async DB session from the shared factory."""
@@ -39,6 +43,7 @@ DBSession = Annotated[AsyncSession, Depends(get_db)]
 
 
 # ---------- Current User (JWT) ----------
+
 
 async def get_current_user(
     authorization: Annotated[str | None, Header()] = None,

@@ -9,10 +9,10 @@ import pytest
 
 from app.agent.prompts import PLANNER_SYSTEM_PROMPT
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_plan(*steps: dict) -> str:
     """Build a JSON-array string mimicking planner LLM output."""
@@ -39,6 +39,7 @@ def _step(
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def base_state() -> dict:
     return {
@@ -64,6 +65,7 @@ def base_state() -> dict:
 # ---------------------------------------------------------------------------
 # Plan structure tests
 # ---------------------------------------------------------------------------
+
 
 class TestPlannerDecomposition:
     """Verify the planner decomposes requests into correct tool sequences."""
@@ -128,18 +130,35 @@ class TestPlannerPromptStructure:
     """Verify planner prompt meets requirements."""
 
     def test_prompt_lists_github_tools(self):
-        for tool in ("list_repos", "list_pull_requests", "get_pull_request",
-                      "create_pull_request", "list_issues", "create_issue"):
+        for tool in (
+            "list_repos",
+            "list_pull_requests",
+            "get_pull_request",
+            "create_pull_request",
+            "list_issues",
+            "create_issue",
+        ):
             assert tool in PLANNER_SYSTEM_PROMPT
 
     def test_prompt_lists_project_mgmt_tools(self):
-        for tool in ("list_projects", "list_tickets", "get_ticket",
-                      "create_ticket", "update_ticket", "assign_ticket"):
+        for tool in (
+            "list_projects",
+            "list_tickets",
+            "get_ticket",
+            "create_ticket",
+            "update_ticket",
+            "assign_ticket",
+        ):
             assert tool in PLANNER_SYSTEM_PROMPT
 
     def test_prompt_lists_calendar_tools(self):
-        for tool in ("list_events", "get_event", "create_event",
-                      "find_free_slots", "list_attendees"):
+        for tool in (
+            "list_events",
+            "get_event",
+            "create_event",
+            "find_free_slots",
+            "list_attendees",
+        ):
             assert tool in PLANNER_SYSTEM_PROMPT
 
     def test_prompt_specifies_parallel_group(self):

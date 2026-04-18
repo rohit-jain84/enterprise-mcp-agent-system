@@ -6,7 +6,7 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import redis.asyncio as aioredis
 
@@ -60,7 +60,7 @@ class CostTracker:
         return f"cost:user:{user_id}"
 
     def _user_daily_key(self, user_id: uuid.UUID) -> str:
-        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        today = datetime.now(UTC).strftime("%Y-%m-%d")
         return f"cost:user:{user_id}:daily:{today}"
 
     async def record_usage(
@@ -73,7 +73,7 @@ class CostTracker:
     ) -> UsageRecord:
         """Record a usage event and update running totals."""
         cost = calculate_cost(input_tokens, output_tokens, model)
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
 
         record = UsageRecord(
             input_tokens=input_tokens,
@@ -106,20 +106,28 @@ class CostTracker:
 
         # Push to session history list
         history_key = f"{session_key}:history"
-        pipe.rpush(history_key, json.dumps({
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-            "model": model,
-            "cost": cost,
-            "timestamp": now,
-        }))
+        pipe.rpush(
+            history_key,
+            json.dumps(
+                {
+                    "input_tokens": input_tokens,
+                    "output_tokens": output_tokens,
+                    "model": model,
+                    "cost": cost,
+                    "timestamp": now,
+                }
+            ),
+        )
         pipe.expire(history_key, 86400 * 30)
 
         await pipe.execute()
 
         logger.debug(
             "Recorded usage: session=%s tokens=%d+%d cost=%.6f",
-            session_id, input_tokens, output_tokens, cost,
+            session_id,
+            input_tokens,
+            output_tokens,
+            cost,
         )
         return record
 
@@ -147,9 +155,7 @@ class CostTracker:
         raw_items = await self.redis.lrange(history_key, 0, -1)
         return [json.loads(item) for item in raw_items]
 
-    async def check_budget(
-        self, user_id: uuid.UUID, session_id: uuid.UUID
-    ) -> tuple[bool, str]:
+    async def check_budget(self, user_id: uuid.UUID, session_id: uuid.UUID) -> tuple[bool, str]:
         """Check whether the user/session is within budget.
 
         Returns (allowed, reason).  If allowed is False, reason explains

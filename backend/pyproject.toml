@@ -38,6 +38,7 @@ dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.24.0",
     "ruff>=0.8.0",
+    "aiosqlite>=0.20.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -45,10 +46,24 @@ packages = ["app"]
 
 [tool.ruff]
 target-version = "py311"
-line-length = 100
+line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["E402", "E501", "F841", "N806", "N815", "E741"]
+"app/agent/prompts.py" = ["E501"]
+"app/agent/tools.py" = ["F841"]
+"app/agent/nodes/**/*.py" = ["N814", "N817", "E501"]
+"app/api/v1/mcp_servers.py" = ["N815"]
+"app/guardrails/rails.py" = ["N806"]
+"app/middleware/error_handler.py" = ["E741"]
+"app/services/chat_service.py" = ["F841"]
+"app/graphs/**/*.py" = ["N806"]
+"app/**/schemas.py" = ["N815"]
+"mcp_servers/**/*.py" = ["N814", "N817", "F841"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

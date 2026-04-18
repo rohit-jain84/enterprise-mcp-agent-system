@@ -3,17 +3,16 @@
 from __future__ import annotations
 
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from app.agent.prompts import ROUTER_SYSTEM_PROMPT
-from app.agent.state import AgentState
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def _base_state() -> dict:
@@ -40,16 +39,19 @@ def _base_state() -> dict:
 
 def _make_llm_response(intent: str, delegate_to: str | None = None, reasoning: str = "") -> str:
     """Build a JSON string mimicking the router LLM output."""
-    return json.dumps({
-        "intent": intent,
-        "delegate_to": delegate_to,
-        "reasoning": reasoning,
-    })
+    return json.dumps(
+        {
+            "intent": intent,
+            "delegate_to": delegate_to,
+            "reasoning": reasoning,
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
 # Intent classification tests
 # ---------------------------------------------------------------------------
+
 
 class TestRouterIntentClassification:
     """Verify the router classifies user messages into the correct intent."""
@@ -63,9 +65,7 @@ class TestRouterIntentClassification:
             ("What events do I have tomorrow?", "needs_tools"),
         ],
     )
-    def test_tool_requests_classified_as_needs_tools(
-        self, user_message: str, expected_intent: str
-    ):
+    def test_tool_requests_classified_as_needs_tools(self, user_message: str, expected_intent: str):
         """Messages requiring tool calls should be classified as needs_tools."""
         # The router prompt instructs the LLM to return needs_tools for these
         assert expected_intent == "needs_tools"
@@ -80,9 +80,7 @@ class TestRouterIntentClassification:
             ("What does PR stand for?", "direct_answer"),
         ],
     )
-    def test_conversational_classified_as_direct_answer(
-        self, user_message: str, expected_intent: str
-    ):
+    def test_conversational_classified_as_direct_answer(self, user_message: str, expected_intent: str):
         assert expected_intent == "direct_answer"
         assert "direct_answer" in ROUTER_SYSTEM_PROMPT
 
@@ -111,9 +109,7 @@ class TestRouterLLMIntegration:
     @pytest.mark.asyncio
     async def test_router_returns_needs_tools_for_pr_query(self, _base_state: dict):
         """When the LLM returns needs_tools, the state should reflect that."""
-        mock_response = _make_llm_response(
-            "needs_tools", reasoning="User wants PR list, requires GitHub tool."
-        )
+        mock_response = _make_llm_response("needs_tools", reasoning="User wants PR list, requires GitHub tool.")
 
         with patch("app.agent.nodes.router.invoke_llm", new_callable=AsyncMock) as mock_llm:
             mock_llm.return_value = mock_response
@@ -132,7 +128,8 @@ class TestRouterLLMIntegration:
     @pytest.mark.asyncio
     async def test_router_returns_delegation_for_triage(self, _base_state: dict):
         mock_response = _make_llm_response(
-            "needs_delegation", delegate_to="triage",
+            "needs_delegation",
+            delegate_to="triage",
             reasoning="Batch triage needs sub-agent.",
         )
 

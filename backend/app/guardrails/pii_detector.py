@@ -10,7 +10,7 @@ trail.
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,7 @@ try:
     PRESIDIO_AVAILABLE = True
 except ImportError:
     PRESIDIO_AVAILABLE = False
-    logger.warning(
-        "presidio-analyzer / presidio-anonymizer not installed. "
-        "PII detection will be unavailable."
-    )
+    logger.warning("presidio-analyzer / presidio-anonymizer not installed. PII detection will be unavailable.")
 
 # Human-readable placeholders keyed by Presidio entity type.
 _PLACEHOLDER_MAP: dict[str, str] = {
@@ -80,7 +77,7 @@ class PIIDetector:
 
     def __init__(
         self,
-        entities: Optional[list[str]] = None,
+        entities: list[str] | None = None,
         language: str = "en",
         score_threshold: float = 0.5,
     ) -> None:
@@ -88,8 +85,8 @@ class PIIDetector:
         self._language = language
         self._score_threshold = score_threshold
 
-        self._analyzer: Optional[Any] = None
-        self._anonymizer: Optional[Any] = None
+        self._analyzer: Any | None = None
+        self._anonymizer: Any | None = None
         self._available: bool = False
 
         self._initialize_engines()
@@ -171,10 +168,7 @@ class PIIDetector:
                     "PII scan found %d entit%s: %s",
                     len(detections),
                     "y" if len(detections) == 1 else "ies",
-                    ", ".join(
-                        f"{d['entity_type']}({d['score']:.2f})"
-                        for d in detections
-                    ),
+                    ", ".join(f"{d['entity_type']}({d['score']:.2f})" for d in detections),
                 )
 
             return detections
@@ -224,9 +218,7 @@ class PIIDetector:
                 etype = result.entity_type
                 if etype not in operators:
                     placeholder = _PLACEHOLDER_MAP.get(etype, f"[{etype}]")
-                    operators[etype] = OperatorConfig(
-                        "replace", {"new_value": placeholder}
-                    )
+                    operators[etype] = OperatorConfig("replace", {"new_value": placeholder})
 
             anonymized = self._anonymizer.anonymize(
                 text=text,

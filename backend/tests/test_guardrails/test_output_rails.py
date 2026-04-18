@@ -5,9 +5,6 @@ from __future__ import annotations
 import re
 from typing import Any
 
-import pytest
-
-
 # ---------------------------------------------------------------------------
 # Output redaction helpers
 # ---------------------------------------------------------------------------
@@ -29,11 +26,13 @@ def redact_pii(text: str) -> tuple[str, list[dict[str, str]]]:
 
     def _replace(pattern: re.Pattern, pii_type: str, replacement: str, text: str) -> str:
         for match in pattern.finditer(text):
-            redactions.append({
-                "type": pii_type,
-                "original": match.group(),
-                "replacement": replacement,
-            })
+            redactions.append(
+                {
+                    "type": pii_type,
+                    "original": match.group(),
+                    "replacement": replacement,
+                }
+            )
         return pattern.sub(replacement, text)
 
     text = _replace(_SSN_RE, "ssn", "[SSN REDACTED]", text)
@@ -65,8 +64,8 @@ def check_output_pii(text: str) -> dict[str, Any]:
 # PII detection in output
 # ---------------------------------------------------------------------------
 
-class TestOutputPIIDetection:
 
+class TestOutputPIIDetection:
     def test_detects_email(self):
         result = check_output_pii("The assignee is sarah@company.com")
         assert result["has_pii"] is True
@@ -105,8 +104,8 @@ class TestOutputPIIDetection:
 # PII redaction in output
 # ---------------------------------------------------------------------------
 
-class TestOutputPIIRedaction:
 
+class TestOutputPIIRedaction:
     def test_redact_email(self):
         text = "The ticket is assigned to sarah@company.com"
         redacted, changes = redact_pii(text)
@@ -167,8 +166,8 @@ class TestOutputPIIRedaction:
 # Edge cases
 # ---------------------------------------------------------------------------
 
-class TestOutputRailEdgeCases:
 
+class TestOutputRailEdgeCases:
     def test_empty_string(self):
         redacted, changes = redact_pii("")
         assert redacted == ""

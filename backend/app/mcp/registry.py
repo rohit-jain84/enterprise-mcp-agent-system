@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from app.mcp.client import MCPClientManager
@@ -57,6 +57,7 @@ def is_write_tool(tool_name: str) -> bool:
 # ---------------------------------------------------------------------------
 # ToolRegistry
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RegisteredTool:

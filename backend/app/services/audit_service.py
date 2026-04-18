@@ -37,7 +37,9 @@ class AuditService:
         await self._db.refresh(entry)
         logger.info(
             "Audit: user=%s action=%s session=%s",
-            user_id, action_str, session_id,
+            user_id,
+            action_str,
+            session_id,
         )
         return entry
 
@@ -68,10 +70,7 @@ class AuditService:
         action: str,
         tool_name: str,
     ) -> AuditLog:
-        audit_action = (
-            AuditAction.APPROVAL_GRANTED if action == "approved"
-            else AuditAction.APPROVAL_REJECTED
-        )
+        audit_action = AuditAction.APPROVAL_GRANTED if action == "approved" else AuditAction.APPROVAL_REJECTED
         return await self.log(
             user_id=user_id,
             action=audit_action,

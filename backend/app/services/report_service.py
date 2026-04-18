@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.database import Message, Session
+from app.models.database import Session
 from app.models.enums import MessageRole
 from app.models.schemas import ReportResponse
 
@@ -46,8 +46,8 @@ class ReportService:
             lines.append("")
             lines.append("## Cost Summary")
             lines.append("")
-            lines.append(f"| Metric | Value |")
-            lines.append(f"|--------|-------|")
+            lines.append("| Metric | Value |")
+            lines.append("|--------|-------|")
             lines.append(f"| Total Tokens | {session.total_tokens:,} |")
             lines.append(f"| Total Cost | ${session.total_cost:.4f} |")
             lines.append(f"| Messages | {len(session.messages)} |")
@@ -75,6 +75,7 @@ class ReportService:
                 lines.append("**Tool Calls:**")
                 lines.append("```json")
                 import json
+
                 lines.append(json.dumps(msg.tool_calls, indent=2)[:3000])
                 lines.append("```")
 
@@ -83,6 +84,7 @@ class ReportService:
                 lines.append("**Tool Results:**")
                 lines.append("```json")
                 import json
+
                 lines.append(json.dumps(msg.tool_results, indent=2)[:3000])
                 lines.append("```")
 
@@ -92,12 +94,12 @@ class ReportService:
             lines.append("")
 
         lines.append("---")
-        lines.append(f"*Report generated at {datetime.now(timezone.utc).isoformat()}*")
+        lines.append(f"*Report generated at {datetime.now(UTC).isoformat()}*")
 
         markdown = "\n".join(lines)
 
         return ReportResponse(
             session_id=session_id,
             markdown=markdown,
-            generated_at=datetime.now(timezone.utc),
+            generated_at=datetime.now(UTC),
         )

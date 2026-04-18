@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime, timedelta
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi import FastAPI, status
@@ -12,10 +12,10 @@ from fastapi.testclient import TestClient
 
 from app.models.schemas import LoginRequest, RefreshRequest, TokenResponse
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def mock_user():
@@ -27,15 +27,15 @@ def mock_user():
     user.role = "user"
     user.is_active = True
     user.hashed_password = "$2b$12$fakehash"
-    user.created_at = datetime.now(timezone.utc)
-    user.updated_at = datetime.now(timezone.utc)
+    user.created_at = datetime.now(UTC)
+    user.updated_at = datetime.now(UTC)
     return user
 
 
 @pytest.fixture
 def app_with_auth(mock_user) -> FastAPI:
     """Build a minimal FastAPI app with auth routes and mocked deps."""
-    from fastapi import APIRouter, Depends
+    from fastapi import APIRouter
 
     app = FastAPI()
     router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
@@ -60,6 +60,7 @@ def app_with_auth(mock_user) -> FastAPI:
                 expires_in=3600,
             )
         from fastapi import HTTPException
+
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
     @router.get("/me")
@@ -84,8 +85,8 @@ def client(app_with_auth: FastAPI) -> TestClient:
 # Login tests
 # ---------------------------------------------------------------------------
 
-class TestLogin:
 
+class TestLogin:
     def test_login_success(self, client: TestClient):
         resp = client.post(
             "/api/v1/auth/login",
@@ -124,8 +125,8 @@ class TestLogin:
 # Token refresh tests
 # ---------------------------------------------------------------------------
 
-class TestTokenRefresh:
 
+class TestTokenRefresh:
     def test_refresh_success(self, client: TestClient):
         resp = client.post(
             "/api/v1/auth/refresh",
@@ -155,8 +156,8 @@ class TestTokenRefresh:
 # Protected endpoint tests
 # ---------------------------------------------------------------------------
 
-class TestProtectedEndpoints:
 
+class TestProtectedEndpoints:
     def test_me_returns_user_info(self, client: TestClient, mock_user):
         resp = client.get("/api/v1/auth/me")
         assert resp.status_code == status.HTTP_200_OK
@@ -174,30 +175,30 @@ class TestJWTValidation:
         secret = "test-secret"
         payload = {
             "sub": str(uuid.uuid4()),
-            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+            "exp": datetime.now(UTC) + timedelta(hours=1),
         }
         token = jwt.encode(payload, secret, algorithm="HS256")
         decoded = jwt.decode(token, secret, algorithms=["HS256"])
         assert decoded["sub"] == payload["sub"]
 
     def test_jwt_expired_token_rejected(self):
-        from jose import jwt, JWTError
+        from jose import JWTError, jwt
 
         secret = "test-secret"
         payload = {
             "sub": str(uuid.uuid4()),
-            "exp": datetime.now(timezone.utc) - timedelta(hours=1),
+            "exp": datetime.now(UTC) - timedelta(hours=1),
         }
         token = jwt.encode(payload, secret, algorithm="HS256")
         with pytest.raises(JWTError):
             jwt.decode(token, secret, algorithms=["HS256"])
 
     def test_jwt_wrong_secret_rejected(self):
-        from jose import jwt, JWTError
+        from jose import JWTError, jwt
 
         payload = {
             "sub": str(uuid.uuid4()),
-            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+            "exp": datetime.now(UTC) + timedelta(hours=1),
         }
         token = jwt.encode(payload, "correct-secret", algorithm="HS256")
         with pytest.raises(JWTError):

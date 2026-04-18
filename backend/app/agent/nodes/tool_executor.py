@@ -115,6 +115,7 @@ async def tool_executor_node(state: AgentState) -> dict[str, Any]:
         for call in pending:
             if is_write_tool(call["tool"]):
                 import uuid
+
                 pending_approval = {
                     "approval_id": str(uuid.uuid4()),
                     "tool_name": call["tool"],

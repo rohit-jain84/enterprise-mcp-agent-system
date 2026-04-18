@@ -60,11 +60,9 @@ async def error_handler_node(state: AgentState) -> dict[str, Any]:
     retrying_steps = {call["step"] for call in retry_calls}
     exhausted_step_set = set(exhausted_steps)
     cleaned_results = [
-        r for r in tool_results
-        if r.get("success") or (
-            r.get("step") not in retrying_steps
-            and r.get("step") not in exhausted_step_set
-        )
+        r
+        for r in tool_results
+        if r.get("success") or (r.get("step") not in retrying_steps and r.get("step") not in exhausted_step_set)
     ]
 
     if retry_calls:
@@ -88,7 +86,8 @@ async def error_handler_node(state: AgentState) -> dict[str, Any]:
 
         logger.info(
             "Retrying %d calls; %d steps exhausted retries",
-            len(retry_calls), len(exhausted_steps),
+            len(retry_calls),
+            len(exhausted_steps),
         )
 
         return {

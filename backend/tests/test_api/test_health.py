@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from fastapi import FastAPI, status
@@ -10,10 +10,10 @@ from fastapi.testclient import TestClient
 
 from app.models.schemas import HealthResponse
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def app_with_health() -> FastAPI:
@@ -33,7 +33,7 @@ def app_with_health() -> FastAPI:
                 "project_mgmt": "connected",
                 "calendar": "connected",
             },
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
 
     @router.get("/api/v1/health/degraded")
@@ -47,7 +47,7 @@ def app_with_health() -> FastAPI:
                 "project_mgmt": "error",
                 "calendar": "connected",
             },
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         ).model_dump(mode="json")
 
     app.include_router(router)
@@ -63,8 +63,8 @@ def client(app_with_health: FastAPI) -> TestClient:
 # Tests
 # ---------------------------------------------------------------------------
 
-class TestHealthEndpoint:
 
+class TestHealthEndpoint:
     def test_health_returns_200(self, client: TestClient):
         resp = client.get("/api/v1/health")
         assert resp.status_code == status.HTTP_200_OK
@@ -115,14 +115,13 @@ class TestHealthEndpoint:
 
 
 class TestHealthSchema:
-
     def test_health_response_model(self):
         hr = HealthResponse(
             status="healthy",
             database="connected",
             redis="connected",
             mcp_servers={"github": "connected"},
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
         assert hr.status == "healthy"
         assert hr.mcp_servers["github"] == "connected"
@@ -133,7 +132,7 @@ class TestHealthSchema:
             database="connected",
             redis="connected",
             mcp_servers={},
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
         data = hr.model_dump(mode="json")
         assert isinstance(data["timestamp"], str)

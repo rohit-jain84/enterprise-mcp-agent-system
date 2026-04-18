@@ -47,8 +47,8 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
     # --- Cost Budget ---
-    COST_BUDGET_PER_USER_DAILY: float = 5.0   # max dollars per user per day
-    COST_BUDGET_PER_SESSION: float = 1.0       # max dollars per session
+    COST_BUDGET_PER_USER_DAILY: float = 5.0  # max dollars per user per day
+    COST_BUDGET_PER_SESSION: float = 1.0  # max dollars per session
 
     # --- App ---
     APP_NAME: str = "Enterprise MCP Agent System"

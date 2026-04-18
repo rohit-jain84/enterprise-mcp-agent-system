@@ -15,9 +15,7 @@ logger = logging.getLogger("app.access")
 class LoggingMiddleware(BaseHTTPMiddleware):
     """Log every request with method, path, status, and latency."""
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         request_id = str(uuid.uuid4())[:8]
         request.state.request_id = request_id
 
@@ -28,7 +26,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
         logger.info(
             "[%s] %s %s %s started",
-            request_id, method, path, client,
+            request_id,
+            method,
+            path,
+            client,
         )
 
         try:
@@ -37,7 +38,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             elapsed = (time.perf_counter() - start) * 1000
             logger.exception(
                 "[%s] %s %s 500 %.1fms (unhandled exception)",
-                request_id, method, path, elapsed,
+                request_id,
+                method,
+                path,
+                elapsed,
             )
             raise
 
@@ -47,7 +51,11 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         log_fn = logger.info if response.status_code < 400 else logger.warning
         log_fn(
             "[%s] %s %s %d %.1fms",
-            request_id, method, path, response.status_code, elapsed,
+            request_id,
+            method,
+            path,
+            response.status_code,
+            elapsed,
         )
 
         return response

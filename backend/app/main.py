@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -50,8 +50,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.warning("Redis unavailable -- cost tracking will be degraded", exc_info=True)
 
     # Log MCP server endpoints
-    logger.info("MCP servers: github=%s  project=%s  calendar=%s",
-                settings.GITHUB_MCP_URL, settings.PROJECT_MGMT_MCP_URL, settings.CALENDAR_MCP_URL)
+    logger.info(
+        "MCP servers: github=%s  project=%s  calendar=%s",
+        settings.GITHUB_MCP_URL,
+        settings.PROJECT_MGMT_MCP_URL,
+        settings.CALENDAR_MCP_URL,
+    )
 
     logger.info("%s ready", settings.APP_NAME)
 

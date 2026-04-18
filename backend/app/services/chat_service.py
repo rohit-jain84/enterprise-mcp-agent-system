@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Any, Callable, Coroutine
+from collections.abc import Callable, Coroutine
+from typing import Any
 
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
@@ -75,6 +76,7 @@ class ChatService:
             return []
 
         from sqlalchemy import select
+
         from app.models.database import Message
 
         result = await self._db.execute(
@@ -113,8 +115,16 @@ class ChatService:
         response = await llm.ainvoke(messages)
 
         # Extract usage
-        input_tokens = getattr(response, "usage_metadata", {}).get("input_tokens", 0) if hasattr(response, "usage_metadata") and response.usage_metadata else 0
-        output_tokens = getattr(response, "usage_metadata", {}).get("output_tokens", 0) if hasattr(response, "usage_metadata") and response.usage_metadata else 0
+        input_tokens = (
+            getattr(response, "usage_metadata", {}).get("input_tokens", 0)
+            if hasattr(response, "usage_metadata") and response.usage_metadata
+            else 0
+        )
+        output_tokens = (
+            getattr(response, "usage_metadata", {}).get("output_tokens", 0)
+            if hasattr(response, "usage_metadata") and response.usage_metadata
+            else 0
+        )
         cost = calculate_cost(input_tokens, output_tokens)
 
         # Persist assistant message

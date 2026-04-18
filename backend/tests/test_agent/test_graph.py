@@ -2,14 +2,10 @@
 
 from __future__ import annotations
 
-import json
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
-
-from app.agent.state import AgentState
-
 
 # ---------------------------------------------------------------------------
 # Mock MCP tool responses
@@ -87,6 +83,7 @@ def _mock_tool_response(tool_name: str, args: dict) -> dict:
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def mock_mcp_client():
     """Create a mock MCP client that returns canned tool responses."""
@@ -121,6 +118,7 @@ def initial_state() -> dict:
 # Integration tests
 # ---------------------------------------------------------------------------
 
+
 class TestGraphEndToEnd:
     """End-to-end tests for the agent graph with mocked MCP."""
 
@@ -129,10 +127,22 @@ class TestGraphEndToEnd:
         """Status report query should invoke PR + ticket tools and produce a summary."""
         # Simulate the full flow: router -> planner -> executor -> synthesizer
         plan = [
-            {"step": 1, "tool": "list_pull_requests", "server": "github",
-             "args": {"state": "open"}, "parallel_group": 1, "status": "pending"},
-            {"step": 2, "tool": "list_tickets", "server": "project_mgmt",
-             "args": {"status": "in_progress"}, "parallel_group": 1, "status": "pending"},
+            {
+                "step": 1,
+                "tool": "list_pull_requests",
+                "server": "github",
+                "args": {"state": "open"},
+                "parallel_group": 1,
+                "status": "pending",
+            },
+            {
+                "step": 2,
+                "tool": "list_tickets",
+                "server": "project_mgmt",
+                "args": {"status": "in_progress"},
+                "parallel_group": 1,
+                "status": "pending",
+            },
         ]
         initial_state["current_plan"] = plan
 
@@ -140,12 +150,14 @@ class TestGraphEndToEnd:
         results = []
         for step in plan:
             resp = await mock_mcp_client.call_tool(step["tool"], step["args"])
-            results.append({
-                "step": step["step"],
-                "tool": step["tool"],
-                "result": resp["result"],
-                "error": resp["error"],
-            })
+            results.append(
+                {
+                    "step": step["step"],
+                    "tool": step["tool"],
+                    "result": resp["result"],
+                    "error": resp["error"],
+                }
+            )
 
         assert len(results) == 2
         assert results[0]["result"] == MOCK_PR_LIST
@@ -169,12 +181,27 @@ class TestGraphEndToEnd:
     async def test_parallel_execution_same_group(self, mock_mcp_client):
         """Steps in the same parallel_group should all execute."""
         plan = [
-            {"step": 1, "tool": "list_pull_requests", "server": "github",
-             "args": {}, "parallel_group": 1},
-            {"step": 2, "tool": "list_tickets", "server": "project_mgmt",
-             "args": {}, "parallel_group": 1},
-            {"step": 3, "tool": "list_events", "server": "calendar",
-             "args": {}, "parallel_group": 1},
+            {
+                "step": 1,
+                "tool": "list_pull_requests",
+                "server": "github",
+                "args": {},
+                "parallel_group": 1,
+            },
+            {
+                "step": 2,
+                "tool": "list_tickets",
+                "server": "project_mgmt",
+                "args": {},
+                "parallel_group": 1,
+            },
+            {
+                "step": 3,
+                "tool": "list_events",
+                "server": "calendar",
+                "args": {},
+                "parallel_group": 1,
+            },
         ]
 
         group_1 = [s for s in plan if s["parallel_group"] == 1]
@@ -189,31 +216,35 @@ class TestGraphEndToEnd:
     async def test_sequential_groups_execute_in_order(self, mock_mcp_client):
         """Steps in higher parallel_groups should execute after lower ones."""
         plan = [
-            {"step": 1, "tool": "list_tickets", "server": "project_mgmt",
-             "args": {}, "parallel_group": 1},
-            {"step": 2, "tool": "get_sprint_report", "server": "project_mgmt",
-             "args": {"sprint": "current"}, "parallel_group": 2},
+            {
+                "step": 1,
+                "tool": "list_tickets",
+                "server": "project_mgmt",
+                "args": {},
+                "parallel_group": 1,
+            },
+            {
+                "step": 2,
+                "tool": "get_sprint_report",
+                "server": "project_mgmt",
+                "args": {"sprint": "current"},
+                "parallel_group": 2,
+            },
         ]
 
         # Execute group 1 first
-        group_1_result = await mock_mcp_client.call_tool(
-            plan[0]["tool"], plan[0]["args"]
-        )
+        group_1_result = await mock_mcp_client.call_tool(plan[0]["tool"], plan[0]["args"])
         assert group_1_result["result"] == MOCK_TICKET_LIST
 
         # Then group 2
-        group_2_result = await mock_mcp_client.call_tool(
-            plan[1]["tool"], plan[1]["args"]
-        )
+        group_2_result = await mock_mcp_client.call_tool(plan[1]["tool"], plan[1]["args"])
         assert group_2_result["result"] == MOCK_SPRINT_REPORT
 
     @pytest.mark.asyncio
     async def test_error_increments_error_count(self, initial_state: dict):
         """Tool errors should increment error_count in state."""
         error_client = AsyncMock()
-        error_client.call_tool = AsyncMock(
-            return_value={"result": None, "error": "Connection refused"}
-        )
+        error_client.call_tool = AsyncMock(return_value={"result": None, "error": "Connection refused"})
 
         resp = await error_client.call_tool("list_pull_requests", {})
         assert resp["error"] is not None
@@ -260,9 +291,7 @@ class TestGraphErrorRecovery:
     async def test_timeout_error_recovery(self):
         """Agent should recover from a tool timeout."""
         error_client = AsyncMock()
-        error_client.call_tool = AsyncMock(
-            return_value={"result": None, "error": "Request timed out after 30s"}
-        )
+        error_client.call_tool = AsyncMock(return_value={"result": None, "error": "Request timed out after 30s"})
 
         resp = await error_client.call_tool("list_pull_requests", {})
         assert resp["error"] is not None
@@ -277,9 +306,7 @@ class TestGraphErrorRecovery:
 
         # Second tool fails
         failing_client = AsyncMock()
-        failing_client.call_tool = AsyncMock(
-            return_value={"result": None, "error": "Service unavailable"}
-        )
+        failing_client.call_tool = AsyncMock(return_value={"result": None, "error": "Service unavailable"})
         resp2 = await failing_client.call_tool("list_pull_requests", {})
         assert resp2["error"] is not None
 
@@ -302,8 +329,13 @@ class TestGraphApprovalFlow:
     @pytest.mark.asyncio
     async def test_write_operation_requires_approval(self, initial_state: dict):
         """Write operations should set pending_approval."""
-        write_tools = ["create_issue", "create_pull_request", "assign_ticket",
-                       "merge_pull_request", "transition_ticket"]
+        write_tools = [
+            "create_issue",
+            "create_pull_request",
+            "assign_ticket",
+            "merge_pull_request",
+            "transition_ticket",
+        ]
 
         for tool_name in write_tools:
             initial_state["pending_approval"] = {

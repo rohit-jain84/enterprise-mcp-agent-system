@@ -13,14 +13,16 @@ from app.config import get_settings
 logger = logging.getLogger(__name__)
 
 # Paths that do not require authentication
-PUBLIC_PATHS = frozenset({
-    "/api/v1/auth/login",
-    "/api/v1/auth/refresh",
-    "/api/v1/health",
-    "/docs",
-    "/redoc",
-    "/openapi.json",
-})
+PUBLIC_PATHS = frozenset(
+    {
+        "/api/v1/auth/login",
+        "/api/v1/auth/refresh",
+        "/api/v1/health",
+        "/docs",
+        "/redoc",
+        "/openapi.json",
+    }
+)
 
 
 class JWTMiddleware(BaseHTTPMiddleware):
@@ -32,9 +34,7 @@ class JWTMiddleware(BaseHTTPMiddleware):
     for downstream logging / auditing purposes.
     """
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         request.state.user_id = None
 
         # Skip validation for public paths and WebSocket upgrades

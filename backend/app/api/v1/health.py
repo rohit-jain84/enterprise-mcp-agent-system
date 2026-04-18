@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
 from fastapi import APIRouter
@@ -74,5 +74,5 @@ async def health_check():
         database=db_status,
         redis=redis_status,
         mcp_servers=mcp_servers,
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
     )

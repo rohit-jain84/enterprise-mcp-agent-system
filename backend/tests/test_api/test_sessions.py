@@ -3,26 +3,25 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
-from unittest.mock import MagicMock
+from datetime import UTC, datetime
 
 import pytest
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
 
-from app.models.schemas import SessionCreate, SessionResponse
-
+from app.models.schemas import SessionCreate
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 def _make_session(
     session_id: uuid.UUID | None = None,
     user_id: uuid.UUID | None = None,
     title: str = "New Chat",
 ) -> dict:
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     return {
         "id": str(session_id or uuid.uuid4()),
         "user_id": str(user_id or uuid.uuid4()),
@@ -71,6 +70,7 @@ def app_with_sessions(user_id: uuid.UUID) -> FastAPI:
     async def get_session(session_id: str):
         if session_id not in _sessions:
             from fastapi import HTTPException
+
             raise HTTPException(status_code=404, detail="Session not found")
         return _sessions[session_id]
 
@@ -78,6 +78,7 @@ def app_with_sessions(user_id: uuid.UUID) -> FastAPI:
     async def update_session(session_id: str, body: dict):
         if session_id not in _sessions:
             from fastapi import HTTPException
+
             raise HTTPException(status_code=404, detail="Session not found")
         _sessions[session_id].update(body)
         return _sessions[session_id]
@@ -86,6 +87,7 @@ def app_with_sessions(user_id: uuid.UUID) -> FastAPI:
     async def delete_session(session_id: str):
         if session_id not in _sessions:
             from fastapi import HTTPException
+
             raise HTTPException(status_code=404, detail="Session not found")
         del _sessions[session_id]
 
@@ -102,8 +104,8 @@ def client(app_with_sessions: FastAPI) -> TestClient:
 # CRUD tests
 # ---------------------------------------------------------------------------
 
-class TestSessionCreate:
 
+class TestSessionCreate:
     def test_create_session_default_title(self, client: TestClient):
         resp = client.post("/api/v1/sessions/", json={"title": "New Chat"})
         assert resp.status_code == status.HTTP_201_CREATED
@@ -123,7 +125,6 @@ class TestSessionCreate:
 
 
 class TestSessionList:
-
     def test_list_sessions_empty(self, client: TestClient):
         resp = client.get("/api/v1/sessions/")
         assert resp.status_code == status.HTTP_200_OK
@@ -138,7 +139,6 @@ class TestSessionList:
 
 
 class TestSessionGet:
-
     def test_get_session_exists(self, client: TestClient):
         create_resp = client.post("/api/v1/sessions/", json={"title": "My Session"})
         session_id = create_resp.json()["id"]
@@ -154,7 +154,6 @@ class TestSessionGet:
 
 
 class TestSessionUpdate:
-
     def test_update_session_title(self, client: TestClient):
         create_resp = client.post("/api/v1/sessions/", json={"title": "Old Title"})
         session_id = create_resp.json()["id"]
@@ -173,7 +172,6 @@ class TestSessionUpdate:
 
 
 class TestSessionDelete:
-
     def test_delete_session(self, client: TestClient):
         create_resp = client.post("/api/v1/sessions/", json={"title": "To Delete"})
         session_id = create_resp.json()["id"]

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi import FastAPI, WebSocket, status
@@ -13,10 +11,10 @@ from fastapi.testclient import TestClient
 
 from app.models.schemas import ChatRequest, ChatResponse, WSMessage, WSOutbound
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def session_id() -> uuid.UUID:
@@ -36,9 +34,7 @@ def app_with_chat(session_id: uuid.UUID) -> FastAPI:
             message_id=uuid.uuid4(),
             session_id=body.session_id,
             content="Here is a summary of your sprint progress.",
-            tool_calls=[
-                {"tool": "get_sprint_report", "args": {"sprint": "current"}, "status": "success"}
-            ],
+            tool_calls=[{"tool": "get_sprint_report", "args": {"sprint": "current"}, "status": "success"}],
             token_count=150,
             cost=0.003,
         )
@@ -53,25 +49,22 @@ def app_with_chat(session_id: uuid.UUID) -> FastAPI:
 
                 if msg.get("type") == "user_message":
                     # Send stream_start
-                    await websocket.send_json(
-                        {"type": "stream_start", "payload": {}}
-                    )
+                    await websocket.send_json({"type": "stream_start", "payload": {}})
                     # Send a chunk
                     await websocket.send_json(
-                        {"type": "stream_chunk", "payload": {"content": "Processing your request..."}}
+                        {
+                            "type": "stream_chunk",
+                            "payload": {"content": "Processing your request..."},
+                        }
                     )
                     # Send tool_call
-                    await websocket.send_json(
-                        {"type": "tool_call", "payload": {"tool": "list_tickets", "args": {}}}
-                    )
+                    await websocket.send_json({"type": "tool_call", "payload": {"tool": "list_tickets", "args": {}}})
                     # Send tool_result
                     await websocket.send_json(
                         {"type": "tool_result", "payload": {"tool": "list_tickets", "result": []}}
                     )
                     # Send stream_end
-                    await websocket.send_json(
-                        {"type": "stream_end", "payload": {"content": "Done."}}
-                    )
+                    await websocket.send_json({"type": "stream_end", "payload": {"content": "Done."}})
         except Exception:
             pass
 
@@ -88,8 +81,8 @@ def client(app_with_chat: FastAPI) -> TestClient:
 # HTTP Chat endpoint tests
 # ---------------------------------------------------------------------------
 
-class TestChatEndpoint:
 
+class TestChatEndpoint:
     def test_chat_success(self, client: TestClient, session_id: uuid.UUID):
         resp = client.post(
             "/api/v1/chat/",
@@ -138,8 +131,8 @@ class TestChatEndpoint:
 # WebSocket flow tests
 # ---------------------------------------------------------------------------
 
-class TestWebSocketChat:
 
+class TestWebSocketChat:
     def test_websocket_full_flow(self, client: TestClient, session_id: uuid.UUID):
         with client.websocket_connect(f"/api/v1/chat/ws/{session_id}") as ws:
             # Send a user message
@@ -170,8 +163,13 @@ class TestWebSocketChat:
     def test_websocket_message_types(self, client: TestClient, session_id: uuid.UUID):
         """All outbound message types should be in the expected set."""
         expected_types = {
-            "stream_start", "stream_chunk", "stream_end",
-            "tool_call", "tool_result", "approval_request", "error",
+            "stream_start",
+            "stream_chunk",
+            "stream_end",
+            "tool_call",
+            "tool_result",
+            "approval_request",
+            "error",
         }
 
         with client.websocket_connect(f"/api/v1/chat/ws/{session_id}") as ws:
@@ -189,8 +187,8 @@ class TestWebSocketChat:
 # Schema validation tests
 # ---------------------------------------------------------------------------
 
-class TestChatSchemas:
 
+class TestChatSchemas:
     def test_chat_request_validation(self):
         req = ChatRequest(session_id=uuid.uuid4(), message="Hello")
         assert len(req.message) > 0

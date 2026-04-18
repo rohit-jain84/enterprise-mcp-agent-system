@@ -6,8 +6,8 @@ import json
 import logging
 from typing import Any
 
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 
 from app.agent.prompts import SYNTHESIZER_SYSTEM_PROMPT
 from app.agent.state import AgentState
@@ -58,10 +58,12 @@ async def synthesizer_node(state: AgentState) -> dict[str, Any]:
     # If there's nothing to synthesize (direct answer), just pass conversation through
     if not context_parts:
         prompt_messages = [
-            SystemMessage(content=(
-                "You are a helpful enterprise assistant. Answer the user's "
-                "question directly and concisely in Markdown."
-            )),
+            SystemMessage(
+                content=(
+                    "You are a helpful enterprise assistant. Answer the user's "
+                    "question directly and concisely in Markdown."
+                )
+            ),
             *state["messages"],
         ]
     else:
@@ -69,11 +71,13 @@ async def synthesizer_node(state: AgentState) -> dict[str, Any]:
         prompt_messages = [
             SystemMessage(content=SYNTHESIZER_SYSTEM_PROMPT),
             *state["messages"],
-            HumanMessage(content=(
-                f"Here is the data collected from enterprise systems:\n\n"
-                f"{context_block}\n\n"
-                f"Please synthesize a complete response for the user."
-            )),
+            HumanMessage(
+                content=(
+                    f"Here is the data collected from enterprise systems:\n\n"
+                    f"{context_block}\n\n"
+                    f"Please synthesize a complete response for the user."
+                )
+            ),
         ]
 
     response = await llm.ainvoke(prompt_messages)

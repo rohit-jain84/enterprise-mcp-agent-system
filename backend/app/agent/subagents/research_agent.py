@@ -7,8 +7,8 @@ import json
 import logging
 from typing import Any
 
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 
 from app.agent.prompts import RESEARCH_AGENT_SYSTEM_PROMPT
 from app.agent.state import AgentState
@@ -24,16 +24,17 @@ _GPT4O_OUTPUT_COST = 10.0 / 1_000_000
 async def _research_plan(llm: ChatOpenAI, query: str, available_tools: list[dict]) -> list[dict]:
     """Ask the LLM to produce a research plan given available tools."""
     tool_summary = "\n".join(
-        f"- **{t['name']}** ({t.get('server', '?')}): {t.get('description', 'No description')}"
-        for t in available_tools
+        f"- **{t['name']}** ({t.get('server', '?')}): {t.get('description', 'No description')}" for t in available_tools
     )
     planning_prompt = [
-        SystemMessage(content=(
-            "You are a research planner. Given a research question and available tools, "
-            "produce a JSON array of data-gathering steps. Each step: "
-            '{"step": N, "tool": "tool_name", "server": "server_name", "args": {...}, "purpose": "why"}.\n\n'
-            f"Available tools:\n{tool_summary}"
-        )),
+        SystemMessage(
+            content=(
+                "You are a research planner. Given a research question and available tools, "
+                "produce a JSON array of data-gathering steps. Each step: "
+                '{"step": N, "tool": "tool_name", "server": "server_name", "args": {...}, "purpose": "why"}.\n\n'
+                f"Available tools:\n{tool_summary}"
+            )
+        ),
         HumanMessage(content=query),
     ]
     resp = await llm.ainvoke(planning_prompt)
@@ -119,11 +120,13 @@ async def research_agent_node(state: AgentState) -> dict[str, Any]:
     results_block = json.dumps(results_list, indent=2, default=str)
     synthesis_prompt = [
         SystemMessage(content=RESEARCH_AGENT_SYSTEM_PROMPT),
-        HumanMessage(content=(
-            f"Research question: {query}\n\n"
-            f"Data gathered:\n```json\n{results_block}\n```\n\n"
-            f"Please synthesise a research report."
-        )),
+        HumanMessage(
+            content=(
+                f"Research question: {query}\n\n"
+                f"Data gathered:\n```json\n{results_block}\n```\n\n"
+                f"Please synthesise a research report."
+            )
+        ),
     ]
     synthesis_resp = await llm.ainvoke(synthesis_prompt)
 

@@ -56,6 +56,7 @@ DEFAULT_WEIGHTS = {
 # Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TaskResult:
     task_id: int
@@ -88,13 +89,14 @@ class EvalReport:
 # Task loading
 # ---------------------------------------------------------------------------
 
+
 def load_tasks(
     path: Path = TASKS_PATH,
     category: str | None = None,
     task_id: int | None = None,
 ) -> list[dict[str, Any]]:
     """Load evaluation tasks from JSON, optionally filtering."""
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, encoding="utf-8") as fh:
         tasks: list[dict[str, Any]] = json.load(fh)
 
     if task_id is not None:
@@ -103,9 +105,7 @@ def load_tasks(
         tasks = [t for t in tasks if t["category"] == category.upper()]
 
     if not tasks:
-        raise ValueError(
-            f"No tasks found (category={category!r}, task_id={task_id!r})"
-        )
+        raise ValueError(f"No tasks found (category={category!r}, task_id={task_id!r})")
 
     return tasks
 
@@ -113,6 +113,7 @@ def load_tasks(
 # ---------------------------------------------------------------------------
 # Mock agent runner (used when the real agent is unavailable)
 # ---------------------------------------------------------------------------
+
 
 async def _run_agent_mock(task: dict[str, Any]) -> dict[str, Any]:
     """Placeholder agent runner that returns an empty response.
@@ -129,6 +130,7 @@ async def _run_agent_mock(task: dict[str, Any]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Agent runner
 # ---------------------------------------------------------------------------
+
 
 async def run_agent(task: dict[str, Any]) -> dict[str, Any]:
     """Run a single evaluation task through the agent.
@@ -149,6 +151,7 @@ async def run_agent(task: dict[str, Any]) -> dict[str, Any]:
         error_injection = task.get("error_injection")
         if error_injection:
             import os
+
             os.environ["MCP_ERROR_INJECTION"] = json.dumps(error_injection)
 
         result = await invoke_agent(
@@ -173,10 +176,7 @@ async def run_agent(task: dict[str, Any]) -> dict[str, Any]:
                 break
 
         # Collect tool call names from results.
-        tool_calls = [
-            tr.get("tool", tr.get("tool_name", "unknown"))
-            for tr in result.get("tool_results", [])
-        ]
+        tool_calls = [tr.get("tool", tr.get("tool_name", "unknown")) for tr in result.get("tool_results", [])]
 
         return {
             "response": response_text,
@@ -192,6 +192,7 @@ async def run_agent(task: dict[str, Any]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Scoring dispatcher
 # ---------------------------------------------------------------------------
+
 
 async def score_task(task: dict[str, Any], result: dict[str, Any]) -> dict[str, float]:
     """Score a single task result using the appropriate scoring method."""
@@ -231,6 +232,7 @@ async def score_task(task: dict[str, Any], result: dict[str, Any]) -> dict[str, 
 # ---------------------------------------------------------------------------
 # Report generation
 # ---------------------------------------------------------------------------
+
 
 def generate_report(report: EvalReport) -> str:
     """Generate a human-readable Markdown evaluation report."""
@@ -347,9 +349,7 @@ async def run_eval(
 
     # Compute overall score
     if report.results:
-        report.overall_score = (
-            sum(r.composite for r in report.results) / len(report.results)
-        )
+        report.overall_score = sum(r.composite for r in report.results) / len(report.results)
     report.total_duration_seconds = sum(r.duration_seconds for r in report.results)
 
     return report
@@ -358,6 +358,7 @@ async def run_eval(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run evaluation suite")

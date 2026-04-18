@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import uuid
-from typing import AsyncGenerator
-from unittest.mock import AsyncMock
+from collections.abc import AsyncGenerator
 
 import pytest
 import pytest_asyncio
@@ -18,8 +17,8 @@ from app.config import Settings
 from app.dependencies import get_current_user, get_db, get_settings
 from app.models.database import Base, User
 
-
 # ---------- Settings override ----------
+
 
 def _test_settings() -> Settings:
     return Settings(
@@ -48,6 +47,7 @@ _test_session_factory = async_sessionmaker(
 
 
 # ---------- Fixtures ----------
+
 
 @pytest.fixture(scope="session")
 def event_loop():
