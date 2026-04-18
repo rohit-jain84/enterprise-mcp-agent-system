@@ -16,7 +16,10 @@ import pytest
 # import from there instead.
 
 _PROMPT_INJECTION_PATTERNS: list[re.Pattern] = [
-    re.compile(r"ignore\s+(your|all|previous)\s+(instructions?|rules?|guidelines?)", re.I),
+    re.compile(
+        r"ignore\s+(your|all|previous)(\s+(your|all|previous))?\s+(instructions?|rules?|guidelines?)",
+        re.I,
+    ),
     re.compile(r"reveal\s+(your\s+)?(system\s+)?prompt", re.I),
     re.compile(r"you\s+are\s+now\s+", re.I),
     re.compile(r"pretend\s+(to\s+be|you\s+are)", re.I),

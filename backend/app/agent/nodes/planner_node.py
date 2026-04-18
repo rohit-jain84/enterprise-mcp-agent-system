@@ -18,12 +18,14 @@ logger = logging.getLogger(__name__)
 _GPT4O_INPUT_COST = 2.50 / 1_000_000
 _GPT4O_OUTPUT_COST = 10.0 / 1_000_000
 
+_last_usage: dict[str, int] = {"input_tokens": 0, "output_tokens": 0}
 
-async def planner_node(state: AgentState) -> dict[str, Any]:
-    """Produce an execution plan -- a list of tool call steps.
 
-    The plan is stored in ``current_plan`` and the first batch of calls is
-    placed into ``pending_tool_calls``.
+async def invoke_llm(messages: list[Any]) -> str:
+    """Invoke the planner LLM and return raw string content.
+
+    Side-effect: records usage in ``_last_usage`` for the caller to read.
+    Extracted so tests can monkeypatch without touching ChatOpenAI.
     """
     settings = get_settings()
     llm = ChatOpenAI(
@@ -32,7 +34,19 @@ async def planner_node(state: AgentState) -> dict[str, Any]:
         max_tokens=2048,
         temperature=0.0,
     )
+    response = await llm.ainvoke(messages)
+    usage = response.usage_metadata or {}
+    _last_usage["input_tokens"] = usage.get("input_tokens", 0)
+    _last_usage["output_tokens"] = usage.get("output_tokens", 0)
+    return response.content
 
+
+async def planner_node(state: AgentState) -> dict[str, Any]:
+    """Produce an execution plan -- a list of tool call steps.
+
+    The plan is stored in ``current_plan`` and the first batch of calls is
+    placed into ``pending_tool_calls``.
+    """
     # Build few-shot messages
     few_shot_msgs: list = []
     for entry in PLANNER_FEW_SHOT:
@@ -50,14 +64,12 @@ async def planner_node(state: AgentState) -> dict[str, Any]:
         *state["messages"],
     ]
 
-    response = await llm.ainvoke(prompt_messages)
-
-    usage = response.usage_metadata or {}
-    input_tokens = usage.get("input_tokens", 0)
-    output_tokens = usage.get("output_tokens", 0)
+    raw_content = await invoke_llm(prompt_messages)
+    input_tokens = _last_usage["input_tokens"]
+    output_tokens = _last_usage["output_tokens"]
 
     # Parse the plan JSON
-    raw = response.content.strip()
+    raw = raw_content.strip()
     # Strip markdown fences if the model wrapped them
     if raw.startswith("```"):
         raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]

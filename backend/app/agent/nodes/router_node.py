@@ -19,6 +19,28 @@ logger = logging.getLogger(__name__)
 _GPT4O_MINI_INPUT_COST = 0.15 / 1_000_000  # $0.15 per 1M input tokens
 _GPT4O_MINI_OUTPUT_COST = 0.60 / 1_000_000  # $0.60 per 1M output tokens
 
+_last_usage: dict[str, int] = {"input_tokens": 0, "output_tokens": 0}
+
+
+async def invoke_llm(messages: list[Any]) -> str:
+    """Invoke the router LLM and return raw string content.
+
+    Side-effect: records usage in ``_last_usage`` for the caller.
+    Extracted so tests can monkeypatch without touching ChatOpenAI.
+    """
+    settings = get_settings()
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        api_key=settings.OPENAI_API_KEY,
+        max_tokens=256,
+        temperature=0.0,
+    )
+    response = await llm.ainvoke(messages)
+    usage = response.usage_metadata or {}
+    _last_usage["input_tokens"] = usage.get("input_tokens", 0)
+    _last_usage["output_tokens"] = usage.get("output_tokens", 0)
+    return response.content
+
 
 def _build_few_shot_messages() -> list[HumanMessage | AIMessage]:
     """Convert the few-shot list into LangChain message objects."""
@@ -37,14 +59,6 @@ async def router_node(state: AgentState) -> dict[str, Any]:
     Returns partial state update with ``delegate_to`` and an AI message
     containing the raw classification JSON.
     """
-    settings = get_settings()
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        api_key=settings.OPENAI_API_KEY,
-        max_tokens=256,
-        temperature=0.0,
-    )
-
     # Build the prompt: system + few-shot + conversation history
     prompt_messages = [
         SystemMessage(content=ROUTER_SYSTEM_PROMPT),
@@ -52,15 +66,12 @@ async def router_node(state: AgentState) -> dict[str, Any]:
         *state["messages"],
     ]
 
-    response = await llm.ainvoke(prompt_messages)
-
-    # Track token usage
-    usage = response.usage_metadata or {}
-    input_tokens = usage.get("input_tokens", 0)
-    output_tokens = usage.get("output_tokens", 0)
+    raw_content = await invoke_llm(prompt_messages)
+    input_tokens = _last_usage["input_tokens"]
+    output_tokens = _last_usage["output_tokens"]
 
     # Parse the classification JSON
-    raw = response.content.strip()
+    raw = raw_content.strip()
     try:
         classification = json.loads(raw)
     except json.JSONDecodeError:
