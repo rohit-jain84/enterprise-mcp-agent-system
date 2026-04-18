@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import uuid
 from collections.abc import AsyncGenerator
 
@@ -17,13 +18,21 @@ from app.config import Settings
 from app.dependencies import get_current_user, get_db, get_settings
 from app.models.database import Base, User
 
+# ---------- Test DB URL ----------
+# Honor DATABASE_URL from env (CI sets Postgres); fall back to SQLite for local
+# unit-test runs that don't touch JSONB-heavy tables. Note: the ORM uses
+# Postgres-specific JSONB columns, so tests hitting sessions/messages/approvals/
+# audit_logs will require Postgres.
+_TEST_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
+
+
 # ---------- Settings override ----------
 
 
 def _test_settings() -> Settings:
     return Settings(
-        DATABASE_URL="sqlite+aiosqlite:///./test.db",
-        REDIS_URL="redis://localhost:6379/15",
+        DATABASE_URL=_TEST_DATABASE_URL,
+        REDIS_URL=os.getenv("REDIS_URL", "redis://localhost:6379/15"),
         JWT_SECRET_KEY="test-secret-key",
         OPENAI_API_KEY="test-key",
         LANGCHAIN_TRACING_V2=False,
@@ -35,7 +44,7 @@ def _test_settings() -> Settings:
 # ---------- Engine & session for tests ----------
 
 _test_engine = create_async_engine(
-    "sqlite+aiosqlite:///./test.db",
+    _TEST_DATABASE_URL,
     echo=False,
 )
 
