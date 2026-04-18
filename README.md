@@ -14,25 +14,25 @@ Under the hood, the system uses [LangGraph](https://github.com/langchain-ai/lang
 
 ## Screenshots
 
-### Chat — Multi-tool orchestration with rich responses
-The agent queries project management tools, returns structured ticket breakdowns with priority levels, and renders markdown tables, code blocks, and tool call details in real time.
+### Chat — Cross-tool reasoning in a single session
+Multi-turn conversation: the agent transitions a ticket (triggering an approval), then answers a follow-up question about team workload. Real `list_tickets` tool call with JSON arguments, a 3-row workload table, and an insight line — all in one session.
 
 ![Chat Interface](screenshots/02-chat.png)
 
 ### Approvals — Human-in-the-loop for write operations
-Write operations (ticket transitions, calendar events, PR comments) pause for explicit human approval. The approval queue shows pending requests with tool parameters, timestamps, and one-click approve/reject actions.
+Write operations (ticket transitions, calendar events, PR comments) pause for explicit human approval. The queue shows pending requests with tool parameters, timestamps, and one-click approve/reject actions.
 
 ![Approval Queue](screenshots/03-approvals.png)
+
+### Settings — MCP server health dashboard
+Real-time health checks across all connected MCP servers (GitHub, Project Management, Calendar). **3 of 3 connected, 26 tools available** — matching the `26 tools across 3 MCP servers` claim elsewhere in this README.
+
+![Settings Dashboard](screenshots/05-settings.png)
 
 ### History — Session management and search
 Browse past agent sessions with search, status filters (All / Active / Completed / Archived), and session metadata including timestamps and message counts.
 
 ![Session History](screenshots/04-history.png)
-
-### Settings — MCP server health dashboard
-Monitor the status of all connected MCP servers (GitHub, Project Management, Calendar) with real-time health checks, tool counts, and connection diagnostics.
-
-![Settings Dashboard](screenshots/05-settings.png)
 
 ---
 

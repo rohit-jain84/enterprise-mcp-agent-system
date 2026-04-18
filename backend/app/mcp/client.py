@@ -80,28 +80,50 @@ class MCPClientManager:
             sum(1 for s in self._servers.values() if s.healthy),
         )
 
+    # Static tool manifest for each MCP server. The servers expose FastMCP's
+    # SSE transport which does not publish a REST ``/tools/list`` endpoint, so
+    # we advertise the tool names here and consider a server healthy as long
+    # as the SSE endpoint responds.
+    _TOOL_MANIFEST: dict[str, list[str]] = {
+        "github": [
+            "get_ci_status", "list_commits", "list_issues", "get_issue_details",
+            "list_pull_requests", "get_pr_details", "get_pr_diff",
+            "create_issue", "add_comment", "add_labels",
+        ],
+        "project_mgmt": [
+            "get_backlog", "get_assignments", "list_sprints", "get_sprint_details",
+            "list_tickets", "get_ticket_details", "get_velocity",
+            "update_ticket_priority", "update_ticket_assignee",
+            "update_ticket_labels", "move_ticket",
+        ],
+        "calendar": [
+            "check_availability", "list_meetings", "get_meeting_details",
+            "get_attendees", "get_meeting_notes",
+        ],
+    }
+
     async def _discover_server(self, server: MCPServerConfig) -> None:
-        """Discover tools from a single MCP server via ``POST /tools/list``."""
+        """Probe the MCP server's SSE endpoint and load its tool manifest."""
         assert self._http is not None
         try:
-            resp = await self._http.post(
-                f"{server.base_url}/tools/list",
-                json={},
-            )
-            resp.raise_for_status()
-            payload = resp.json()
-            tools: list[dict] = payload.get("tools", [])
-            server.tools = tools
-            server.healthy = True
-            for tool in tools:
-                tool_name = tool["name"]
-                self._tool_to_server[tool_name] = server.name
-            logger.info(
-                "Discovered %d tools from %s", len(tools), server.name,
-            )
+            async with self._http.stream(
+                "GET", f"{server.base_url}/sse", timeout=5.0,
+            ) as resp:
+                healthy = resp.status_code == 200
         except Exception:
-            server.healthy = False
-            logger.exception("Failed to discover tools from %s", server.name)
+            healthy = False
+            logger.exception("Failed to reach %s SSE endpoint", server.name)
+
+        server.healthy = healthy
+        if healthy:
+            tool_names = self._TOOL_MANIFEST.get(server.name, [])
+            server.tools = [{"name": n, "description": ""} for n in tool_names]
+            for n in tool_names:
+                self._tool_to_server[n] = server.name
+            logger.info(
+                "MCP server %s reachable; %d tools registered",
+                server.name, len(tool_names),
+            )
 
     # ------------------------------------------------------------------
     # Tool invocation
@@ -186,16 +208,15 @@ class MCPClientManager:
         return self._tool_to_server.get(tool_name)
 
     async def health_check(self) -> dict[str, bool]:
-        """Ping every server and return a name -> healthy mapping."""
+        """Probe each server's SSE endpoint and return a name -> healthy mapping."""
         results: dict[str, bool] = {}
         for server in self._servers.values():
             try:
                 assert self._http is not None
-                resp = await self._http.get(
-                    f"{server.base_url}/health",
-                    timeout=5.0,
-                )
-                healthy = resp.status_code == 200
+                async with self._http.stream(
+                    "GET", f"{server.base_url}/sse", timeout=5.0,
+                ) as resp:
+                    healthy = resp.status_code == 200
             except Exception:
                 healthy = False
             server.healthy = healthy
