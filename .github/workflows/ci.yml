@@ -110,6 +110,6 @@ jobs:
         run: docker build -t enterprise-mcp-frontend ./frontend
       - name: Build MCP servers
         run: |
-          docker build -t mcp-github ./mcp_servers/github_server
-          docker build -t mcp-project-mgmt ./mcp_servers/project_management_server
-          docker build -t mcp-calendar ./mcp_servers/calendar_server
+          docker build -t mcp-github -f ./mcp_servers/github_server/Dockerfile ./mcp_servers
+          docker build -t mcp-project-mgmt -f ./mcp_servers/project_management_server/Dockerfile ./mcp_servers
+          docker build -t mcp-calendar -f ./mcp_servers/calendar_server/Dockerfile ./mcp_servers
